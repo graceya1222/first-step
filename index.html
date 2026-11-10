@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>첫 걸음 정책 노선도</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@500;700;800;900&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 어두운 통로 → 질문마다 발자국이 하나씩 켜지고 끝의 빛이 커짐 → 도착하면 밝은 화면에서 정책 카드 5장.
+   부스 아이패드(키오스크)와 QR로 연 개인 폰, 두 화면을 하나의 파일로. 의도적으로 한 가지 룩(밤의 통로 + 빛)으로 고정. */
+:root{
+  --night:#0B1020; --night2:#141B33; --mist:#8C95B5; --star:#EEF1FA;
+  --light:#FFD98A; --light2:#FFF3D6;
+  --day:#F5F6FA; --paper:#FFFFFF; --ink:#141824; --sub:#596079; --rule:#DFE2EC;
+  --job:#3F6FF0; --biz:#F07A2E; --money:#17A06F; --rel:#D9468F;
+  --ok:#17A06F; --warn:#B0761A; --warn-bg:#FDF2DC;
+  --display:"Gothic A1","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--night);color:var(--star);font-family:var(--body);font-size:17px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere}
+body.day{background:var(--day);color:var(--ink);color-scheme:light}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.28}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--light);outline-offset:3px}
+.c-job{--c:var(--job)} .c-biz{--c:var(--biz)} .c-money{--c:var(--money)} .c-rel{--c:var(--rel)}
+
+/* ── 통로 배경 ── */
+.tunnel{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;--lit:0}
+.tunnel .glow{position:absolute;left:50%;top:-30vh;width:calc(60vmax + 90vmax*var(--lit));height:calc(60vmax + 90vmax*var(--lit));transform:translateX(-50%);border-radius:50%;
+  background:radial-gradient(circle,rgba(255,236,190,calc(.30 + .55*var(--lit))) 0%,rgba(255,217,138,calc(.12 + .25*var(--lit))) 28%,transparent 62%);transition:width .9s ease,height .9s ease,background .9s}
+.tunnel .arch{position:absolute;left:50%;top:6vh;border:1.5px solid rgba(255,230,180,.13);border-bottom:0;border-radius:999px 999px 0 0;transform:translateX(-50%);transition:opacity .9s}
+body.day .tunnel{display:none}
+
+.wrap{position:relative;z-index:1;max-width:820px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;
+  padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));padding-block:20px 28px}
+.wrap.wide{max-width:1180px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{background:none;border:0;padding:0;display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:-.01em}
+.brand svg{width:22px;height:22px}
+.ghost{background:none;border:1px solid rgba(238,241,250,.25);border-radius:999px;padding:7px 16px;font-size:14px;color:var(--mist)}
+.ghost:hover{color:var(--star);border-color:var(--star)}
+body.day .ghost{border-color:var(--rule);color:var(--sub)}
+body.day .ghost:hover{color:var(--ink);border-color:var(--ink)}
+
+/* ── 인트로 ── */
+.intro{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:22px;padding-block:6vh}
+.intro .eyebrow{font-size:14px;letter-spacing:.14em;color:var(--light);font-weight:600}
+.intro h1{font-size:clamp(34px,7vw,64px);font-weight:900;letter-spacing:-.035em;max-width:13em}
+.intro h1 em{font-style:normal;color:var(--light)}
+.intro p{color:var(--mist);max-width:30em;margin:0;font-size:18px}
+.steps-preview{display:flex;gap:14px;align-items:flex-end;margin-top:6px}
+.steps-preview svg{width:22px;height:36px;fill:rgba(255,217,138,.25)}
+.steps-preview svg:nth-child(odd){transform:translateY(-10px) scaleX(-1)}
+.steps-preview svg.on{fill:var(--light);filter:drop-shadow(0 0 8px rgba(255,217,138,.8))}
+.btn{border:0;border-radius:999px;padding:18px 34px;font-weight:600;font-size:19px;background:var(--light);color:#2A1E05;display:inline-flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 0 0 6px rgba(255,217,138,.14),0 10px 40px rgba(255,217,138,.25);transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.3;box-shadow:none;cursor:not-allowed}
+.btn.dark{background:var(--ink);color:#fff;box-shadow:none}
+.btn.line{background:transparent;color:inherit;border:1.5px solid currentColor;box-shadow:none}
+.link{background:none;border:0;color:var(--mist);text-decoration:underline;text-underline-offset:4px;font-size:15px}
+body.day .link{color:var(--sub)}
+
+/* ── 발자국 진행 ── */
+.path{display:flex;align-items:center;gap:6px;margin:26px auto 0;max-width:100%}
+.path .fp{width:18px;height:30px;fill:rgba(238,241,250,.14);transition:fill .5s,filter .5s,transform .5s;flex:none}
+.path .fp.l{transform:translateY(-7px) scaleX(-1)}
+.path .fp.r{transform:translateY(7px)}
+.path .fp.done{fill:rgba(255,217,138,.75)}
+.path .fp.now{fill:var(--light);filter:drop-shadow(0 0 10px rgba(255,217,138,.9))}
+.path .sun{flex:none;width:30px;height:30px;border-radius:50%;margin-left:8px;background:radial-gradient(circle,var(--light2),var(--light) 45%,rgba(255,217,138,0) 72%);opacity:calc(.35 + .65*var(--lit))}
+.stepcount{text-align:center;color:var(--mist);font-size:14px;margin-top:10px;font-variant-numeric:tabular-nums}
+.stepcount b{color:var(--light);font-weight:600}
+
+/* ── 질문 ── */
+.q{flex:1;display:flex;flex-direction:column;justify-content:center;padding-block:28px 12px;width:100%;max-width:680px;margin:0 auto}
+.q h2{font-size:clamp(26px,4.6vw,38px);font-weight:800;letter-spacing:-.025em;text-align:center}
+.q .hint{color:var(--mist);text-align:center;margin:10px auto 28px;max-width:30em;font-size:16px}
+.q h3.sub{font-size:18px;font-weight:700;margin:26px 0 12px;text-align:center}
+.walk{animation:walk .55s cubic-bezier(.2,.7,.2,1) both}
+@keyframes walk{from{transform:translateY(26px) scale(.97);filter:blur(2px)}to{transform:none;filter:none}}
+.opts{display:grid;gap:12px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opts.four{grid-template-columns:repeat(4,1fr);gap:10px}
+.opts.four .opt{justify-content:center;padding:16px 6px}
+.opts.four .opt .box{display:none}
+@media (max-width:520px){.opts.two{grid-template-columns:1fr}}
+.opt{text-align:left;background:rgba(255,255,255,.04);border:1.5px solid rgba(238,241,250,.16);border-radius:18px;padding:17px 20px;display:flex;gap:14px;align-items:center;transition:border-color .2s,background .2s,box-shadow .2s;min-height:64px}
+.opt:hover{border-color:rgba(238,241,250,.4)}
+.opt[aria-pressed="true"]{border-color:var(--light);background:rgba(255,217,138,.1);box-shadow:0 0 24px rgba(255,217,138,.18)}
+.opt .box{flex:none;width:24px;height:24px;border-radius:8px;border:1.5px solid rgba(238,241,250,.35);display:grid;place-items:center;font-size:14px;color:transparent}
+.opt.radio .box{border-radius:50%}
+.opt[aria-pressed="true"] .box{background:var(--light);border-color:var(--light);color:#2A1E05}
+.opt b{display:block;font-weight:600;font-size:17.5px}
+.opt small{display:block;color:var(--mist);font-size:14.5px;line-height:1.45;margin-top:2px}
+.opt .dot{flex:none;width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c)}
+
+.age{display:grid;gap:22px;justify-items:center}
+.age-row{display:flex;align-items:center;gap:26px}
+.age-row button{width:64px;height:64px;border-radius:50%;border:1.5px solid rgba(238,241,250,.25);background:rgba(255,255,255,.05);font-size:30px;line-height:1}
+.age-val{font-family:var(--display);font-weight:900;font-size:96px;line-height:1;min-width:2.2ch;text-align:center;font-variant-numeric:tabular-nums;color:var(--light);text-shadow:0 0 40px rgba(255,217,138,.45)}
+.age-val small{font-size:26px;margin-left:4px;color:var(--star)}
+.age input{width:min(100%,460px);accent-color:var(--light)}
+.age .scale{width:min(100%,460px);display:flex;justify-content:space-between;font-size:13px;color:var(--mist);font-variant-numeric:tabular-nums}
+
+.nav{display:flex;gap:12px;justify-content:center;align-items:center;padding-top:18px;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav .btn{min-width:220px}
+.nav .back{background:none;border:0;color:var(--mist);font-size:16px;padding:14px}
+
+/* ── 도착(결과) ── */
+.arrive{position:relative;border-radius:28px;padding:34px 30px;background:radial-gradient(120% 140% at 50% -20%,var(--light2) 0%,#FFFFFF 55%);border:1px solid var(--rule);overflow:hidden;margin-top:18px;display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center}
+.arrive .eyebrow{font-size:14px;letter-spacing:.1em;color:var(--warn);font-weight:600}
+.arrive h1{font-size:clamp(28px,4.4vw,44px);font-weight:900;letter-spacing:-.03em;margin-top:6px}
+.arrive p{margin:10px 0 0;color:var(--sub);max-width:34em}
+.me{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.me span{font-size:13.5px;background:var(--day);border:1px solid var(--rule);border-radius:999px;padding:4px 11px;color:var(--sub)}
+.qr{display:grid;justify-items:center;gap:8px;text-align:center;background:var(--paper);border:1px solid var(--rule);border-radius:20px;padding:16px 16px 14px;width:214px}
+.qr #qrbox{width:180px;height:180px;display:grid;place-items:center}
+.qr #qrbox img,.qr #qrbox canvas,.qr #qrbox svg{width:180px!important;height:180px!important;image-rendering:pixelated}
+.qr b{font-family:var(--display);font-size:15.5px}
+.qr span{font-size:12.5px;color:var(--sub);line-height:1.45}
+@media (max-width:700px){.arrive{grid-template-columns:1fr;padding:26px 20px}.qr{justify-self:center}}
+
+.secthead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:36px 0 14px}
+.secthead h2{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.secthead span{color:var(--sub);font-size:14px}
+
+.deck{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(300px,360px);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 18px;align-items:start;scrollbar-width:thin}
+.deck>*{scroll-snap-align:start}
+@media (max-width:640px){.deck{grid-auto-flow:row;grid-auto-columns:auto;overflow:visible}.swipe{display:none}}
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.card .head{padding:18px 20px 16px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 14%,#fff),#fff);border-bottom:1px solid var(--rule)}
+.card .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.rank{font-family:var(--display);font-weight:900;font-size:30px;color:var(--c);line-height:1;font-variant-numeric:tabular-nums}
+.cat{font-size:13px;font-weight:600;color:var(--c);display:flex;align-items:center;gap:6px}
+.cat::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.badge{border-radius:6px;padding:2px 8px;font-size:12.5px;font-weight:600}
+.badge.ok{background:color-mix(in srgb,var(--ok) 13%,#fff);color:var(--ok)}
+.badge.check{background:var(--warn-bg);color:var(--warn)}
+.card .lead{color:var(--sub);font-size:14.5px;margin:14px 0 0}
+.card h3{font-size:23px;font-weight:800;letter-spacing:-.02em;margin-top:2px;color:var(--ink)}
+.card .tags{color:var(--c);font-size:13.5px;margin-top:6px}
+.card .body{padding:16px 20px 18px;display:grid;gap:14px;font-size:15px;color:var(--ink)}
+.card ul{margin:0;padding-left:1.1em;display:grid;gap:5px}
+.why{display:flex;flex-wrap:wrap;gap:6px}
+.why span{font-size:12.5px;background:var(--day);border-radius:6px;padding:3px 8px;color:var(--sub)}
+.why span b{color:var(--ink);font-weight:600}
+.warnbox{background:var(--warn-bg);border-radius:10px;padding:10px 12px;font-size:14px}
+.warnbox b{color:var(--warn)}
+.card h4{margin:0 0 4px;font-size:12.5px;letter-spacing:.06em;color:var(--sub);font-weight:600}
+.gloss{display:grid;gap:5px;font-size:13.5px;color:var(--sub)}
+.gloss b{color:var(--ink);font-weight:600}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.more{border:1px solid var(--rule);background:var(--paper);border-radius:10px;padding:9px 14px;font-size:14px;font-weight:600;color:var(--ink)}
+.go{display:inline-flex;align-items:center;gap:6px;background:var(--c);color:#fff;text-decoration:none;font-weight:600;border-radius:10px;padding:9px 14px;font-size:14px}
+
+.others{display:grid;gap:8px}
+.other{display:grid;grid-template-columns:10px 1fr auto;gap:14px;align-items:center;background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:12px 16px;text-decoration:none;color:var(--ink)}
+.other i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.other b{display:block;font-weight:600}
+.other span{display:block;font-size:13.5px;color:var(--sub)}
+.other em{font-style:normal;font-size:13px;color:var(--sub)}
+.plats{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.plat{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:14px;text-decoration:none;color:var(--ink);display:grid;gap:4px;font-size:13.5px}
+.plat b{font-family:var(--display);font-size:15.5px}
+.plat span{color:var(--sub);line-height:1.5}
+.endbar{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:34px}
+.foot{margin-top:26px;font-size:13px;color:var(--sub);border-top:1px solid var(--rule);padding-top:14px}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.filters button{border:1px solid var(--rule);background:var(--paper);border-radius:999px;padding:7px 14px;font-size:14px;color:var(--ink);display:flex;align-items:center;gap:6px}
+.filters button i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.filters button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;align-items:start}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+.deck .rise:nth-child(2){animation-delay:.08s}.deck .rise:nth-child(3){animation-delay:.16s}.deck .rise:nth-child(4){animation-delay:.24s}.deck .rise:nth-child(5){animation-delay:.32s}
+@keyframes rise{from{transform:translateY(22px)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.walk,.rise{animation:none}.tunnel .glow{transition:none}}
+</style>
+</head>
+<body>
+
+
+<div class="tunnel" id="tunnel" aria-hidden="true"><div class="glow"></div></div>
+<div class="wrap" id="app"></div>
+
+<script>
+const DATA = {"P": [{"id": "job1", "cat": "job", "name": "청년도전지원사업", "intro": "쉬고 있는 청년의 구직 의욕을 다시 깨워주는!", "tags": "#구직단념청년 #참여수당 #밀착상담", "detail": "• 대상: 18~34세 구직단념청년(6개월 이상 취업·교육·훈련 이력 없음) 및 자립준비·청소년복지시설·북한이탈·지역특화 청년\n• 내용: 단기(5주)·중기(15주)·장기(25주) 맞춤 상담·진로탐색 프로그램, 이수 시 참여수당·인센티브 포함 50만~최대 350만원", "sum": "• 18~34세 구직단념청년의 취업 준비를 도와줘요.\n• 5주(단기)·15주(중기)·25주(장기) 중 내 상태에 맞는 과정을 배정받고, 이수하면 참여수당을 받아요.\n  (단기 50만원, 장기는 인센티브 포함 최대 350만원!)\n• 상담·진로탐색부터 취업역량 강화까지 단계별로 지원해요.", "link": "https://m.work24.go.kr/wk/g/b/1100/busiIntro.do"}, {"id": "job2", "cat": "job", "name": "청년성장프로젝트", "intro": "청년카페에서 일상과 구직을 함께 챙겨주는!", "tags": "#청년카페 #일상회복 #구직프로그램", "detail": "• 대상: 15~34세 청년 누구나(지자체 인정 시 목표 인원 30%까지 추가 참여)\n• 내용: 청년카페 등 인프라 제공, 일상유지·구직 프로그램, 정부·지자체 청년 고용정책 연계", "sum": "• 15~34세 청년이라면 누구나 청년카페를 이용할 수 있어요. (상담이나 프로그램 없이도 OK)\n• 면접 스타일링, 마음건강 교육, 취업스터디까지 일상과 구직을 함께 챙겨줘요.\n• 초기상담 후 일상유지·구직 프로그램을 받고, 정부·지자체 청년 고용정책과도 연계해줘요.", "link": "https://www.work24.go.kr/wk/v/a/1000/youngGrowIntro.do#none"}, {"id": "job3", "cat": "job", "name": "국민취업지원제도", "intro": "상담부터 취업알선까지 취업 전 과정을 돕는!", "tags": "#구직촉진수당 #심층상담 #취업알선", "detail": "• 지원자격: 15~69세 구직자(I유형: 소득·재산·취업경험 요건 충족, II유형: 중위소득 100% 이하, 청년은 소득 무관)\n• 지원내용: 심층상담 기반 취업지원 서비스, I유형 구직촉진수당 월 60~100만 원(6개월), II유형 취업활동비용 지원", "sum": "• 취업상담부터 직업훈련·일경험·취업알선까지 한 번에 지원해요.\n• I유형은 구직촉진수당을 월 60~100만원씩 6개월간 받고, II유형은 취업활동비용을 지원받아요.\n• II유형이라면 15~34세 청년은 소득과 상관없이 신청할 수 있어요.", "link": "https://www.work24.go.kr/ua/z/z/1300/selectEmssRqutIntro.do"}, {"id": "job4", "cat": "job", "name": "구직자 도약보장 패키지", "intro": "1:1 상담으로 나만의 경력 로드맵을 설계하는!", "tags": "#직무역량진단 #1:1상담 #경력로드맵", "detail": "• 지원자격: 취업을 위해 경력개발이 필요한 국민 누구나(별도 자격요건 없음)\n• 지원내용: 잡케어 기반 직무역량 진단·노동시장 정보 제공, 1:1 심층상담 경력개발 로드맵, 훈련·자격·일경험 연계", "sum": "• 내가 어떤 일을 해야 할지 막막할 때 1:1 상담을 받을 수 있어요.\n• 진로가 고민되거나 이직, 직무 전환을 준비하는 사람이라면 누구나 받을 수 있어요.\n• 훈련, 자격, 일경험까지 나에게 맞는 서비스를 연결해주고, 고용센터나 고용24로 신청해요.", "link": "https://www.work24.go.kr/cm/c/f/1100/selecSystInfo.do?systId=SI00000326&systClId=SC00000192"}, {"id": "job5", "cat": "job", "name": "서울영커리언스", "intro": "대학 재학 중 기업에서 일하며 학점도 받는!", "tags": "#대학재학생 #현장실습 #학점인정", "detail": "• 지원자격: 참여대학(37개교) 재학 중인 19~39세 청년(휴학생·졸업생 불가)\n• 지원내용: 기업 인턴십(9~12월, 월 약 215만 원) 및 표준현장실습학기제 연계 최대 18학점 인정", "sum": "• 참여 대학 37곳에 재학 중인 학생만 지원할 수 있어요. (휴학생, 졸업생은 불가)\n• 실제 기업에서 일하고, 월 최대 215만원을 받아요.\n• 현장실습으로 최대 18학점까지 인정받을 수 있어요.", "link": "https://youth.seoul.go.kr/youthConts.do?key=2511180001&sc_detailAt=&pageIndex=1&orderBy=regYmd+desc&tabKind=100&sc_pbancSe=&sc_pbancSeCd=028&sc_bbsStngSn=2212200001&sc_bbsCtgrySn=2511170019&sc_pstSn=0&sc_userId=&sc_ntcPstYn=&sc_delYn=&sc_ctgry=&useYn=&sc_faqCtgryCd=025&sc_qnaCtgryCd=&sc_plcyQnaSn=0&pstSn=&sc_bplcPstSn=&recordCountPerPage=8&sc_aplyFldDtl=&sc_hopeTask=&sc_rgnCd=&sw=&subTabKind=gall"}, {"id": "job6", "cat": "job", "name": "경기청년 갭이어 프로그램", "intro": "하고 싶은 프로젝트로 진로를 찾도록 돕는!", "tags": "#진로탐색 #최대500만원 #전문가멘토링", "detail": "• 지원자격: 경기도 거주 19~39세 청년(600명 내외 선발)\n• 지원내용: 진로탐색 프로젝트 지원금 1인 최대 500만 원, 전문가 멘토링·진로 프로그램, 우수자 취·창업 연계", "sum": "• 경기도 청년이 직접 하고 싶은 프로젝트를 정해 도전할 수 있어요.\n• 프로젝트 지원금으로 최대 500만원까지 지원받아요.\n• 취업 성과를 강요하지 않아서 내가 뭘 좋아하는지 찾아볼 수 있는 좋은 기회예요.", "link": "https://www.gg.go.kr/contents/contents.do?ciIdx=987317&menuId=1534167"}, {"id": "job7", "cat": "job", "name": "경기청년 맞춤형 채용지원 서비스", "intro": "경기 미취업 청년에게 1:1 맞춤 취업 컨설팅을 제공하는!", "tags": "#1:1취업컨설팅 #모의면접 #현직자멘토링", "detail": "• 지원자격: 공고일 기준 경기도 거주 18~39세 미취업 청년\n• 지원내용: 직업상담사 1:1 취업 컨설팅, 면접캠프·모의면접·취업특강·현직자 멘토링", "sum": "• 경기도에 사는 18~39세 미취업 청년이라면 누구나 신청할 수 있어요. (기수별 선착순 모집, 잡아바에서 접수)\n• 면접캠프·모의면접·현직자 멘토링 등을 받을 수 있어요.\n• 나에게 꼭 맞는 1:1 취업 전문상담을 제공받고 맞춤형 일자리도 매칭해줘요.", "link": "https://www.gg.go.kr/contents/contents.do?ciIdx=987324&menuId=1534172"}, {"id": "job8", "cat": "job", "name": "K-뉴딜아카데미", "intro": "기업 실무 프로젝트로 무료 직업훈련을 받는!", "tags": "#훈련비전액 #참여수당 #실무프로젝트", "detail": "• 지원자격: 15~34세 미취업 청년(군필자 최대 39세, 재학생·취업자 참여 제한)\n• 지원내용: 기업 실무 프로젝트 중심 교육 훈련비 전액 지원, 참여수당 월 최대 50만 원(수도권 30만 원), 수료 후 취업 연계", "sum": "• 15~34세 미취업 청년이 실무 중심 교육을 무료로 받을 수 있어요.\n• 나의 관심분야 기업의 프로젝트에 참여하고 포트폴리오 제작, 취업 연계까지 지원해요.\n• 취업을 준비하는 청년의 자신감 회복과 새로운 도약을 지원하고 참여수당도 월 최대 30~50만원 나와요.", "link": "https://www.work24.go.kr/cm/c/f/1100/selecSystInfo.do?currentPageNo=1&recordCountPerPage=10&systId=SI00000512&systClId=SC00000391"}, {"id": "job9", "cat": "job", "name": "미래내일 일경험", "intro": "기업에서 직접 일하며 직무 경험을 쌓는!", "tags": "#인턴형 #프로젝트형 #참여수당", "detail": "• 지원자격: 15~34세 미취업 청년(군필자는 복무기간에 비례해 최대 39세)\n• 지원내용: 인턴형(주 37.5만 원)·프로젝트형(월 40만 원+팀 실행비)·ESG지원형(프로그램별 상이)·사회적가치형(월 170만 원) 일경험 및 참여수당", "sum": "• 인턴형, 프로젝트형, ESG지원형, 사회적가치형 중에 골라서 직무 경험을 쌓을 수 있어요.\n• 인턴형은 주 37.5만원, 프로젝트형은 월 40만원(팀 실행비 월 90만원 별도)을 참여수당으로 받아요.\n• 유형마다 기간과 수당이 다르니 고용24 청년일경험 포털에서 수시로 공고를 확인해야 해요.", "link": "https://www.work24.go.kr/cm/c/f/1100/selecSystInfo.do?currentPageNo=2&recordCountPerPage=9&upprSystClId=&systClId=SC00000203&systId=SI00000324"}, {"id": "job10", "cat": "job", "name": "서울 매력일자리", "intro": "서울시 일자리에서 일하며 실무 경력을 쌓는!", "tags": "#생활임금 #직무교육 #취업컨설팅", "detail": "• 지원자격: 공고일 기준 서울시 주민등록 만 18세 이상 미취업자(사업별 요구 조건 충족)\n• 지원내용: 생활임금(월 약 252만 원) 일자리, 전문 직무교육, 응시료·훈련비 지원 및 1:1 취업 컨설팅", "sum": "• 서울에 사는 18세 이상 미취업자가 일하면서 실무 경험을 쌓을 수 있어요.\n• 급여와 함께 직무교육·자격증·취업 컨설팅도 지원해줘요.\n• 근무 기간은 최대 18개월이고, 자격증·어학시험 응시료도 연 3회 지원해요.", "link": "https://job.seoul.go.kr/hmpg/chjb/jbin/jbinInfo.do"}, {"id": "job11", "cat": "job", "name": "서울형 청년인턴 직무캠프", "intro": "직무교육부터 인턴십까지 한 번에 경험하는!", "tags": "#직무교육 #인턴십 #서울청년", "detail": "• 지원자격: 만 18~34세 서울시 거주 청년 구직자(제대군인 최대 3년 연장, AI·디지털 분야는 청년취업사관학교 수료생)\n• 지원내용: 직무 맞춤형 사전교육 및 4개월 인턴십(서울형 생활임금 월 약 253만 원)", "sum": "• 서울 청년이 직무교육을 받고 인턴 경험까지 할 수 있어요.\n• 경영·사무, 영업·마케팅, 국제협력, AI·디지털 등 분야별로 신청 사이트가 달라요.\n• 제대군인은 군복무 기간만큼 최대 3년까지 나이 제한이 늘어나요.", "link": "https://job.seoul.go.kr/hmpg/yijc/yiin/contPageDetail.do?conts_no=482C06C106F10388E063C0A8A02835DE"}, {"id": "job12", "cat": "job", "name": "취업날개서비스", "intro": "면접 정장을 무료로 빌려주는!", "tags": "#면접정장 #무료대여 #연10회", "detail": "• 지원자격: 서울시 거주 고교졸업예정자~만 39세 청년\n• 지원내용: 면접정장 무료대여(1회 3박 4일, 1인 연 10회까지)", "sum": "• 서울 청년이라면 누구나 면접용 정장을 무료로 빌려줘요. (대여기간은 3박4일, 연 최대 10회)\n• 서울에 사는 고교졸업예정자부터 39세까지 이용할 수 있어요.\n• 예약할 때 면접 증빙자료가 꼭 필요하고, 첫 대여 때는 매장에 직접 방문해야 해요.", "link": "https://job.seoul.go.kr/hmpg/spct/ewif/ewifInfo.do"}, {"id": "job13", "cat": "job", "name": "국민내일배움카드", "intro": "직업훈련비를 최대 500만 원까지 지원하는!", "tags": "#훈련비지원 #최대500만원 #훈련장려금", "detail": "• 지원자격: 만 15세 이상 국민 누구나(현직 공무원·사립학교 교직원, 졸업까지 2년 이상 남은 재학생 제외)\n• 지원내용: 5년간 300만~500만 원 한도 내 훈련비 45~100% 지원, 훈련장려금 월 최대 11만 6천원", "sum": "• 15세 이상 국민 누구나 직업훈련비를 5년간 지원받을 수 있고, 고용24에서 발급받아요.\n• 5년간 300만~500만 원 한도 내 훈련비의 45~100%를 지원받고, 훈련장려금으로 월 최대 11만 6천원을 받아요.\n• 카드 발급 후 중간에 취업하거나 퇴사해도5년 이내면 같은 카드로 계속 사용할 수 있어요.", "link": "https://www.work24.go.kr/cm/c/f/1100/selecSystInfo.do?currentPageNo=2&recordCountPerPage=9&upprSystClId=&systClId=SC00000004&systId=SI00000351"}, {"id": "biz1", "cat": "biz", "name": "모두의 창업 프로젝트", "intro": "아이디어 한 장으로 창업 오디션에 도전하는!", "tags": "#아이디어신청서 #창업활동비 #시제품제작비", "detail": "• 지원자격: 예비창업자 및 창업 3년 이내 기업(일반/기술 트랙), 예비창업자만 신청 가능(로컬 트랙)\n• 지원내용: 창업활동비 200만 원·AI 솔루션·멘토링, 단계별 지원금(일반·기술 최대 2,000만 원, 로컬 최대 3,000만 원) 및 투자 연계", "sum": "• 복잡한 서류 없이 1페이지 아이디어 신청서 1장으로 가볍게 도전할 수 있어요\n• 1차에서 떨어져도 다시 도전할 기회를 주고, 창업 활동비와 시제품 제작비를 지원해요\n• 거창한 계획서보다 아이디어 하나로 빠르게 평가받고 싶은 청년에게 추천해요", "link": "https://www.modoo.or.kr/"}, {"id": "biz2", "cat": "biz", "name": "청년 새로:온 창업동아리", "intro": "사회적 가치를 담은 청년 창업동아리를 지원하는!", "tags": "#사회적경제 #팀당200만원 #멘토링", "detail": "• 지원자격: 팀원 모두 경기도에 활동지(거주·재/휴학·재직)를 둔 2~3인 사회적경제 창업동아리(만 24세 이하 청년 1인 이상 포함)\n• 지원내용: 팀당 활동비 약 150만 원＋프로젝트 지원금 128만~200만 원(해커톤 순위별), 전문가 멘토링·특강·네트워킹", "sum": "• 경기도에서 활동하는 2~3인 팀(만 24세 이하 1명 이상 포함)이라면 아이디어만으로 신청할 수 있어요\n• 팀당 최대 200만 원 프로젝트 지원금과 멘토링, 전문가 멘토링 및 IR 대회 참가 기회를 통해 아이디어를 사업화해요\n• ESG나 사회적 가치를 비즈니스로 실현해보고 싶은 경기도 청년에게 딱이에요", "link": "https://gsic.or.kr/home/kor/M632757828/contents.do?"}, {"id": "biz3", "cat": "biz", "name": "넥스트로컬", "intro": "지역 자원을 활용한 서울 청년의 창업을 돕는!", "tags": "#지역자원 #사업화자금 #지역조사비", "detail": "• 지원자격: 서울시 거주 만 19~39세 예비·초기 창업자(개인 또는 3인 이내 팀), 협력 지자체 지역자원 연계 창업모델 필수\n• 지원내용: 지역조사 활동비, 초기 사업화 자금 최대 2,000만 원, 우수팀 후속 사업화 자금 최대 5,000만 원", "sum": "• 서울 거주 청년이 지방의 지역 자원(특산물, 관광 등)을 연계해 창업하도록 돕는 상생 프로젝트예요\n• 현장 조사비부터 사업화 자금(최대 2,000만 원~5,000만 원)까지 단계별로 지원해요\n• 지방의 숨은 자원으로 새로운 사업을 만들어보고 싶은 청년에게 추천해요", "link": "https://seoulnextlocal.co.kr/"}, {"id": "biz4", "cat": "biz", "name": "경기 스타트업 아카데미", "intro": "투자유치·IR 등 실전 창업 교육을 제공하는!", "tags": "#창업교육 #투자유치 #1:1컨설팅", "detail": "• 지원자격: 경기도 거주 예비창업자·청년, 경기도 소재 대학(원) 재·휴학생, 경기도 소재 창업기업 대표·임직원\n• 지원내용: 투자유치·재무관리·IR 교육(3개 과정), 우수 수료자 1:1 컨설팅·기업견학·투자상담회·직접투자 검토", "sum": "• 돈을 주는 정책이 아닌 실전 창업 교육과 1:1 맞춤형 컨설팅에 특화된 경기도 무료 교육이에요\n• 도내 예비·초기 창업가를 위해 투자유치, 재무관리, IR 등 단계별 교육을 제공해요\n• 아이템은 있지만 마케팅이나 투자받는 법이 막막한 청년에게 도움이 돼요", "link": "https://www.gbsa.or.kr/pages/gyeonggi_startup_operation.do"}, {"id": "biz5", "cat": "biz", "name": "예비창업패키지", "intro": "예비창업자에게 사업화 자금을 지원하는!", "tags": "#예비창업자 #사업화자금 #전담멘토링", "detail": "• 지원자격: 공고일 기준 본인 명의 사업자등록(개인/법인)이 없는 예비창업자\n• 지원내용: 사업화 자금 평균 4,000만 원(1단계 2,000만 원, 중간점검 통과 시 추가 지원), 창업교육·멘토링, 투자유치(모의·실전 IR) 프로그램", "sum": "• 사업자등록을 한 적 없는 예비창업자에게 평균 4,000만 원의 사업화 자금을 무상 지원해요\n• 창업 교육과 전담 멘토는 물론, 투자자들 앞에서 사업을 소개할 기회도 얻어요\n• 초기 자금 부담을 줄이고 아이디어를 실제 제품으로 만들어보고 싶은 예비 대표님께 필수예요", "link": "https://www.k-startup.go.kr/web/s/hoLqmxFhmL"}, {"id": "biz6", "cat": "biz", "name": "청년창업사관학교", "intro": "청년 창업가를 자금·공간·교육으로 키워주는!", "tags": "#사업화자금 #창업공간 #창업프로그램", "detail": "• 지원자격: 만 39세 이하, 창업 3년 이내 대표자(경험창업자는 창업 7년 이내)\n• 지원내용: 사업화 자금 평균 0.7억 원(최대 1억 원), 창업 프로그램(기본·심화 과정), 창업공간·인프라·후속 성과관리", "sum": "• 만 39세 이하, 창업 3년 이내(경험창업자는 7년 이내!) 대표자를 위한 종합 육성 사업이에요\n• 최대 1억 원의 경제적 지원과 더불어 창업 공간, 사업화 코칭 등을 함께 제공해요\n• 초기 창업 자금이 부족하거나, 창업 경험을 살려 다시 도전하려는 청년에게 추천해요", "link": "https://start.kosmes.or.kr/yh_ysi010_001.do"}, {"id": "biz7", "cat": "biz", "name": "서울시 청년 골목 창업 경진대회", "intro": "서울 골목에 나만의 매장을 열도록 돕는!", "tags": "#오프라인매장 #창업자금 #저금리융자", "detail": "• 지원자격: 만 19~39세 서울 거주 예비창업가 또는 서울 사업장 운영 3년 미만 초기창업가(개인/2인 이내 팀, 연내 오프라인 매장 오픈 필수)\n• 지원내용: 최대 2,000만 원 창업자금, 최대 7,000만 원 저금리 융자 연계, 1:1 컨설팅·브랜드 워크숍·멘토 네트워킹", "sum": "• 서울 시내에 올해 안에 오프라인 매장을 차릴 만 19~39세 청년을 모집해요\n• 서류/면접을 통과하면 맞춤 컨설팅을 진행한 뒤 최종 선정 시 최대 2,000만 원을 지원해요\n• 자신만의 매력적인 가게나 브랜드 공간을 서울 골목에 차리고 싶은 청년에게 딱이에요", "link": "https://www.narrative-seoul.kr/"}, {"id": "biz8", "cat": "biz", "name": "창업중심대학 지원사업", "intro": "대학 인프라를 활용해 첫 사업화를 지원하는!", "tags": "#대학인프라 #사업화자금 #전문멘토링", "detail": "• 지원자격: 예비창업자 및 창업 7년 이내 기업(대학 구성원 우대, 일반 청년도 주관대학 선택해 신청 가능)\n• 지원내용: 사업화 자금 평균 5,000만 원(트랙별 최대 1~1.5억 원), 대학 장비·공간 활용 및 특화 멘토링·IR·판로 지원", "sum": "• 대학교에 있는 전문 장비, 실험실, 보육 공간 및 대학별 특화 프로그램을 활용할 수 있어요\n• 대학 구성원뿐만 아니라 청년 예비창업자 및 7년 이내 기창업자 누구나 지원 가능해요\n• 대학의 탄탄한 인프라와 멘토링을 발판 삼아 첫 사업화에 도전하고 싶다면 신청해 보세요", "link": "https://www.k-startup.go.kr/web/s/goLqmxFhmL"}, {"id": "biz9", "cat": "biz", "name": "초기창업패키지", "intro": "창업 3년 이내 기업의 사업화를 돕는!", "tags": "#창업3년이내 #시제품제작 #최대1억원", "detail": "• 지원자격: 공고일 기준 창업 3년 이내 중소·창업기업 대표자\n• 지원내용: 사업화 자금 평균 0.5억 원(최대 1억 원), 실증검증·투자유치 등 주관기관별 창업 프로그램", "sum": "• 창업 3년 이내 기업에 시제품 제작, 마케팅 등에 쓰이는 자금을 최대 1억 원까지 지원해요\n• 일반형, 딥테크 특화형 등 자사 특성에 맞는 유형에 선택해 도전할 수 있어요\n• 제품을 실제 시장에 빠르게 출시해 테스트해보고, 매출과 투자를 크게 늘리고 싶은 대표님께 추천해요", "link": "https://www.k-startup.go.kr/web/s/S66vLLDemL"}, {"id": "biz10", "cat": "biz", "name": "창업도약패키지", "intro": "3~7년차 창업기업의 성장 도약을 돕는!", "tags": "#도약기기업 #평균1.2억원 #투자연계", "detail": "• 지원자격: 창업 3년 초과~7년 이내 기업(신산업 분야 10년 이내) 또는 패스트트랙 해당 기업\n• 지원내용: 사업화 자금 평균 1.2억 원(최대 2억 원), 투자유치·글로벌 진출·대기업 협업 등 도약 프로그램", "sum": "• 창업 3년 초과 ~ 7년 이내(신산업은 10년 이내) 기업의 성장의 고비를 넘기도록 도와줘요\n• 평균 1.2억 원(최대 2~3억 원)의 사업화 자금과 대기업 협업 및 투자 연계를 제공해요\n• 초기 단계를 지나 본격적인 매출 확대와 시장 스케일업이 필요한 도약기 청년 기업에 추천해요", "link": "https://www.k-startup.go.kr/web/s/3klOmxFhmL"}, {"id": "money1", "cat": "money", "name": "청년미래적금", "intro": "3년 저축하면 정부가 최대 12%를 더해주는!", "tags": "#월최대50만원 #정부기여금 #3년적금", "detail": "• 지원자격: 19~34세, 개인·가구소득 기준 충족 청년\n• 지원내용: 월 최대 50만 원·3년 저축＋정부기여금 6% 또는 12%＋이자", "sum": "• 월 최대 50만원까지 3년 저축하면 매월 저축한 돈의 6~12%를 정부가 더해줘요.\n• 서류 없이 은행 앱으로 바로 신청, 소득 등 가입조건을 심사받아요.\n• 적금이 끝나기 3개월 전까지 무료 재무 상담을 받으면 이자를 조금 더 받을 수 있어요.", "link": "https://www.kinfa.or.kr/financialProduct/youthFutureSavings.do"}, {"id": "money2", "cat": "money", "name": "청년내일저축계좌", "intro": "일하는 청년의 목돈 마련을 정부가 함께 돕는!", "tags": "#월30만원적립 #3년1440만원 #근로청년", "detail": "• 지원자격: 15~39세, 월 근로·사업소득 10만 원 이상, 가구 중위소득 50% 이하\n• 지원내용: 월 10만 원 이상 저축 시 정부 월 30만 원 적립·3년 지원", "sum": "• 월 10만원씩 3년 저축하면 정부지원금을 합쳐 1,440만원과 이자를 모을 수 있어요.\n• 알바·프리랜서 포함 월 10만원 이상 벌고, 나이·가구소득·재산도 정해진 기준 이하면 신청할 수 있어요.\n• 일과 저축을 유지하고 교육 10시간과 돈 사용계획서 제출필요, 실직·질병으로 저축 어려워지면 해지 전 12개월까지 쉴 수 있어요.", "link": "https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00000060"}, {"id": "money3", "cat": "money", "name": "서울시 희망두배 청년통장", "intro": "저축한 만큼 서울시가 똑같이 채워주는!", "tags": "#서울근로청년 #월15만원매칭 #최대1080만원", "detail": "• 지원자격: 서울 거주 18~34세 근로청년, 본인·가족 소득·재산 기준 충족\n• 지원내용: 월 15만 원 저축＋서울시 15만 원 적립·2년 또는 3년", "sum": "• 월 15만원씩 저축하면 서울시가 15만원을 매월 적립해서 2년 720만원, 3년 1,080만원을 모을 수 있어요.\n• 저축하는 동안 서울에 살고, 근로·저축·금융교육 조건을 지켜야 해요.\n• 청년내일저축계좌 등 비슷한 통장에 가입했거나 지원받았다면, 신청가능한지 먼저 확인해야해요.", "link": "https://account.welfare.seoul.kr/web/contents/youthBank.lp"}, {"id": "money4", "cat": "money", "name": "장병내일준비적금", "intro": "군 복무 중 저축하면 원금만큼 더해주는!", "tags": "#군복무 #월최대55만원 #100%매칭", "detail": "• 지원자격: 현역병·사회복무요원 등, 남은 복무기간 1개월 이상\n• 지원내용: 월 최대 55만 원 저축＋원금의 100% 정부지원＋이자", "sum": "• 군 복무를 마치고 만기 조건을 지키면, 내가 저축한 돈의 100%를 정부가 더해줘요.\n• 한 은행에 월 30만원까지, 서로 다른 두 은행을 합쳐 월 55만원까지 넣을 수 있어서 입영 전 계좌 개설과 은행 앱을 설치하는게 좋아요.\n• 중간에 해지하면 정부지원금과 세금 혜택을 못 받을 수 있으니, 만기까지 유지가 중요해요.", "link": "https://www.mnd.go.kr/mnd/288/subview.do"}, {"id": "money5", "cat": "money", "name": "생애 최초 첫 국민연금보험료 지원", "intro": "18세 청년의 첫 국민연금 보험료를 내주는!", "tags": "#2027년시행 #첫1개월분 #가입기간인정", "detail": "• 지원자격: 2027년 이후 18세가 되는 청년부터 적용\n• 지원내용: 첫 1개월분 국민연금 보험료 지원 또는 가입기간 추가 인정", "sum": "• 2027년부터 국민연금 납부 이력이 없는 18세 청년(2009년생부터)에게 첫 1개월분 국민연금 보험료를 지원해요. \n• 이미 국민연금을 낸 적이 있다면 가입기간 1개월을 추가 인정해줘요.\n• 첫 납부이후 학업·군복무 등 보험료를 내지 못한 기간에 대해서도 추후 납부가 가능해서 연금 수령액을 높일 수 있어요.", "link": "https://www.mohw.go.kr/board.es?mid=a10503010100&bid=0027&act=view&list_no=1490274"}, {"id": "money6", "cat": "money", "name": "청년전용 버팀목 전세자금 대출", "intro": "낮은 금리로 청년의 전세보증금을 빌려주는!", "tags": "#무주택청년 #최대1.5억원 #저금리전세대출", "detail": "• 지원자격: 19~34세 무주택 세대주·예비세대주, 소득·재산 등 기준 충족\n• 지원내용: 보증금의 최대 80%·기본 최대 1.5억 원, 기본금리 연 2.2~3.3%", "sum": "• 전세보증금을 낮은 이자로 빌릴 수 있어서, 전세 자금이 부족한 부부나 청년들에게 추천해요.\n• 부부합산 연소득 5천만원 이하, 순자산액 3.45억원 이하 무주택 세대주(예비세대주 포함) 신청 가능해요.\n• 대출기간은 2년이지만 최장 10년 이용 가능해요.", "link": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020301.jsp"}, {"id": "money7", "cat": "money", "name": "전세보증금반환보증 보증료 지원", "intro": "전세보증금반환보증 보증료를 돌려주는!", "tags": "#보증금지키기 #최대40만원 #보증료환급", "detail": "• 지원자격: 보증금 3억 원 이하 무주택 임차인, 반환보증 가입·소득 기준 충족\n• 지원내용: 이미 낸 반환보증 보증료 최대 40만 원 환급", "sum": "• 전세보증금을 돌려받도록 돕는 전세보증금반환보증(HUG·HF·SGI)에 가입할 때 낸 보증료를 돌려받을 수 있어요.\n• 무주택, 전세보증금 3억 이하, 연소득 5천만 이하·신혼부부 7500만 이하 최대 40만원까지 지원해요.\n• 정부24나 주민센터에서 연중 신청, 예산 소진시 조기 마감될 수 있으니 보증 가입 후 지원조건을 확인해 서둘러 신청해요.", "link": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/161300000103"}, {"id": "money8", "cat": "money", "name": "청년 월세 지원", "intro": "서울 청년의 월세를 매달 최대 20만 원 지원하는!", "tags": "#서울청년 #최대12개월 #생애1회", "detail": "• 지원자격: 서울 거주 19~39세 무주택 청년, 소득·재산·임차조건 충족\n• 지원내용: 실제 월세 중 월 최대 20만 원·최대 12개월, 생애 1회", "sum": "• 서울에 월세로 거주하는 청년의 월세를 최대 20만원씩, 최대 12개월까지 생애 1번만 지원해요. \n• 혼자 살거나 19세~39세인 형제자매·동거인과 함께 살아도, 다른 지원 조건에 맞으면 신청할 수 있어요.\n• 보증금 8천만원 이하 및 월세 60만원 이하 무주택자, 중위소득 48% 초과 ~ 150% 이하여야 해요.", "link": "https://housing.seoul.go.kr/site/main/content/sh01_060513#none"}, {"id": "money9", "cat": "money", "name": "국가장학금", "intro": "가구 형편에 따라 대학 등록금을 지원하는!", "tags": "#대학생 #등록금지원 #학기별신청", "detail": "• 지원자격: 국내 대학생 중 국적·소득·성적 등 기준 충족자\n• 지원내용: 등록금 범위 내 차등 지원, Ⅰ유형 기초·차상위 등록금 전액", "sum": "• 대학 등록금 부담을 줄여주는 장학금으로 대한민국 국적으로 국내 대학 재학생이라면 지원 가능해요.\n• 기초·차상위계층은 등록금 전액, 신입생 외에는 성적기준 충족자로 가구 형편에 따라 지원액이 달라요. \n• 학기마다 직접 신청하고, 필요한 서류와 가족의 정보제공 동의 완료 여부까지 확인해요.", "link": "https://www.kosaf.go.kr/ko/main.do"}, {"id": "money10", "cat": "money", "name": "학자금·생활비 대출 및 이자면제", "intro": "등록금·생활비를 빌리고 이자 부담도 덜어주는!", "tags": "#등록금대출 #생활비200만원 #이자면제", "detail": "• 지원자격: 대학생·대학원생 중 대출 종류별 자격 충족자\n• 지원내용: 등록금·생활비 대출, 생활비 학기당 최대 200만 원·조건별 이자면제", "sum": "• 등록금 대출 : 대학 등록금을 빌릴 수 있어요. 장학금과 달리 갚아야 하는 돈이예요. 일반상황은 약속한 일정에, 취업 후 상환은 소득이 기준을 넘는 등 상환 조건이 생기면 갚아요.\n• 생활비 대출 :  식비, 월세, 기숙사비, 교재비, 교통비 등에 쓸 돈을 학기당 최대 200만원까지 빌려 본인 계좌로 받아요. \n• 등록금·생활비 대출 상환 방식 : 일반상환은 정한 기간 동안 이자만 내다가 원금도 나눠 갚아요. 취업 후 상환은 취업 여부보다 소득이 기준을 넘는 등 상환 조건에 따라 갚아요.\n• 이자면제 : 취업 후 상환대출은 소득 등 조건에 맞으면 정해진 기간의 등록금·생활비 대출 이자를 면제해요. 이자가 면제돼도 원금은 갚아야 해요.", "link": "https://www.kosaf.go.kr/ko/main.do"}, {"id": "money11", "cat": "money", "name": "햇살론유스", "intro": "소득이 적은 청년에게 낮은 이자로 돈을 빌려주는!", "tags": "#취준생 #최대1200만원 #저금리대출", "detail": "• 지원자격: 19~34세·연소득 3,500만 원 이하 취업준비생·사회초년생 등\n• 지원내용: 생활비·취업준비비 등 총 최대 1,200만 원 대출·용도별 한도 적용", "sum": "• 소득이 적거나 없는 청년, 제도권 금융 이용이 어려운 대학(원)생, 취업준비생 대상 낮은 이자 대출이예요.\n• 19세~34세에 최대 1,200만원까지 나눠 빌릴 수 있어요. 300만원을 빌렸다 갚아도, 남은 총한도는 900만원이예요.\n• 서민금융진흥원 앱에서 보증 승인을 받은 뒤, 협약은행 앱에서 대출을 신청해요.", "link": "https://www.kinfa.or.kr/financialProduct/hessalLoanYoos.do"}, {"id": "money12", "cat": "money", "name": "청년 특례 채무 조정", "intro": "빚 갚기 어려운 청년이 다시 일어서도록 돕는!", "tags": "#90일이상연체 #분할상환 #상환유예", "detail": "• 지원자격: 90일 이상 연체한 대학(원)생 또는 34세 이하 미취업청년 등\n• 지원내용: 상환유예·분할상환, 심사에 따른 이자·원금 부담 완화", "sum": "• 90일 이상 대출금 연체 중인 만 19~34세 대학(원)생이나 미취업 청년들이 다시 일어설 수 있도록 도와줘요.\n• 모든 빚이 없어지는 것은 아니지만 빚을 나눠 갚거나 갚는 시기를 늦추고, 심사에 따라 이자·원금 부담을 줄여줘요.\n• 90일까지 연체를 기다리지 말고, 갚기 어렵다면 신용회복위원회에 상담 신청하면 든든한 도움을 받을 수 있어요.", "link": "https://www.ccrs.or.kr/cms/com/index.do?MENU_ID=1940"}, {"id": "rel1", "cat": "rel", "name": "청년문화예술패스", "intro": "19~20세 청년의 문화생활비를 지원하는!", "tags": "#공연전시영화도서 #최대20만원 #생애1회", "detail": "• 지원자격: 만 19~20세\n• 지원내용: 공연·전시·영화·도서 구입비 지원", "sum": "• 생애 한 번 문화생활비를 지원받을 수 있어요.\n• 수도권은 15만 원, 비수도권은 20만 원으로 지정된 온라인 구매처에서만 쓸 수 있어요.\n• 지역 예산이 소진되면 마감되니 연초에 서둘러 신청해야 해요.", "link": "https://youthculturepass.or.kr/kr/main.do"}, {"id": "rel2", "cat": "rel", "name": "청년마을 만들기 사업", "intro": "다른 지역에서 살아보며 일과 사람을 만나는!", "tags": "#지역살아보기 #일거리체험 #주민교류", "detail": "• 지원자격: 만 20~45세 등(프로그램별 모집 연령에 해당하는 청년)\n• 지원내용: 지역 살아보기·일거리 체험·청년 및 주민 교류 프로그램 지원", "sum": "• 다른 지역에서 살아보며 일거리를 체험하거나 자연을 즐기고 새로운 사람들과 교류해요.\n• 전국의 청년마을에서 청년사업가들이 소규모 프로그램을 진행해요.\n• 프로그램마다 참여 나이와 모집 일정이 다르니 청년마을 홈페이지에서 프로그램 공고를 수시로 확인해요.", "link": "https://localro.co.kr/"}, {"id": "rel3", "cat": "rel", "name": "청년인생설계학교", "intro": "막막한 진로와 삶의 방향을 함께 찾아주는!", "tags": "#자기이해 #진로설계 #대면그룹활동", "detail": "• 지원자격: 서울 거주 19~39세(스케치 코스 19~29세 비진학 청년/스타터 코스 18~24세)\n• 지원내용: 자기이해·진로설계 등을 위한 대면 프로그램 지원", "sum": "• 진로나 직장생활이 막막한 서울 청년이라면 앞으로의 방향을 함께 찾아갈 수 있어요.\n• 취준생·사회초년생·대학 비진학 등 상황에 맞춰 코스를 고르고, 대면 그룹활동(5회, 스타터 코스는 2회)에 참여해요.\n• 코스마다 참여 나이와 조건이 다르니 신청 전에 확인해요.", "link": "https://youth.seoul.go.kr/youthConts.do?key=2310200020&sc_pbancSeCd=013&sc_bbsStngSn=2212200001&sc_b"}, {"id": "rel4", "cat": "rel", "name": "고립·은둔청년 지원사업", "intro": "고립·은둔 청년의 일상 회복을 돕는!", "tags": "#맞춤형회복 #가족대리신청 #통합지원", "detail": "• 지원자격: 사회적 관계가 단절되거나 외부 활동이 제한된 19~34세\n• 지원내용: 초기 상담을 통한 맞춤형 프로그램(자기계발·건강관리·신체적/정신적 회복 등) 지원", "sum": "• 사람들과 물리적, 심리적으로 멀어져서 마음이 힘든 청년에게 맞춤형 회복 서비스를   지원해요.\n• 당사자 뿐만 아니라 부모 등 주변인을 돕고, 민관의 다양한 자원 연계까지 통합적으로 지원해요.\n• 혼자 신청하기 어렵다면 함께 사는 가족(8촌 이내의 혈족)이 대신 신청할 수 있어요.", "link": "https://youth.seoul.go.kr/youthConts.do?key=2310100062&sc_pbancSeCd=008&sc_bbsStngSn=2212200001&sc_bbsCtgrySn=2310200007&sc_faqCtgryCd=013"}, {"id": "rel5", "cat": "rel", "name": "시·군별 경기청년공간", "intro": "경기 청년이 쉬고 만나고 성장할 수 있는!", "tags": "#활동휴식공간 #취업창업상담 #문화프로그램", "detail": "• 지원자격: 경기도 거주 18~39세\n• 지원내용: 활동·휴식 공간 및 취업·창업·문화 프로그램 지원", "sum": "• 쉬거나 사람들을 만나고 싶을 때, 자기계발을 하고 싶을 때, 청년 공간을 이용할 수 있어요.\n• 공간에 따라 취업 상담부터 면접 정장 대여, 창업지원, 문화 프로그램까지 다양하게 지원받을 수 있어요.\n• 이용 나이·운영시간·프로그램이 공간마다 다르니, 방문 전에 확인해요.", "link": "https://youth.gg.go.kr/ggyouthplace/youth/place"}, {"id": "rel6", "cat": "rel", "name": "청년마음건강지원사업", "intro": "전문가와 1:1로 마음 이야기를 나누는!", "tags": "#1:1심리상담 #기본6회 #서울청년", "detail": "• 지원자격: 정서적 어려움을 겪는 서울 거주 만 29~39세(의무복무제대군인 연령 연장)\n• 지원내용: 전문가 1:1 맞춤형 심리상담 지원", "sum": "• 우울하거나 불안한 서울 청년이라면, 상담 선생님과 1:1로 마음 이야기를 나누는 맞춤형 상담을 기본 6회 받을 수 있어요.\n• 신청 기간이 짧고 일찍 마감될 수 있으니 빠르게 신청해요. \n• 선정된 후에는 정해진 기간 내에 심리검사 등 필수 절차를 반드시 완료해요.", "link": "https://youth.seoul.go.kr/youthConts.do?key=2310100076&sc_pbancSeCd=009&sc_bbsStngSn=2212200001&sc_bbsCtgrySn=2310200008&sc_qnaCtgryCd=&sc_faqCtgryCd=010&sc_hwStngSn=2501030001&sc_hwCtgrySn=0"}, {"id": "rel7", "cat": "rel", "name": "서울시 청년자율예산제", "intro": "청년이 직접 서울시 정책을 제안하는!", "tags": "#서울청정넷 #정책제안 #예산반영", "detail": "• 지원자격: 서울청년정책네트워크 위원(서울 거주 또는 서울 소재 대학·직장에 소속된 만 19~39세)\n• 지원내용: 서울시 정책 제안 기회 및 교육, 전문가 자문 지원", "sum": "• 서울청년정책네트워크(서울청정넷) 위원이 되면 서울시에 필요한 정책을 직접 제안할 수 있어요.\n• 제안서 작성 교육과 연구원 자문을 받으며 관심 있는 문제를 정책으로 구체화해요.\n• 제안한 사업은 심의와 시민 투표를 통해 100억 원 한도 안에서 예산에 반영돼요.", "link": "https://youth.seoul.go.kr/network/content.do?key=2309180006"}, {"id": "rel8", "cat": "rel", "name": "서울동아리ON(대학생동아리지원)", "intro": "대학생 동아리의 사회기여활동을 지원하는!", "tags": "#서울대학동아리 #최대200만원 #전문가컨설팅", "detail": "• 지원자격: 서울 소재 대학의 학부생 10명 이상 자치 동아리\n• 지원내용: 사회기여활동 경비 및 전문가 컨설팅 지원", "sum": "• 서울에 있는 대학교의 대학생 10명 이상이 모인 동아리라면, 사회에 도움이 되는 활동을 할 때 지원받을 수 있어요.\n• 동아리가 직접 활동을 계획하면 최대 200만 원을, 서울시가 준비한 프로그램에 참여하면 활동에 드는 비용을 지원받아요.\n• 이미 서울시나 구청 지원을 받는 동아리는 참여가 어려워요.", "link": "https://youth.seoul.go.kr/youthConts.do?key=2503190001&sc_detailAt=&pageIndex=1&orderBy=regYmd+desc&tabKind=201&sc_pbancSe=&sc_pbancSeCd=027&sc_bbsStngSn=2212200001&sc_bbsCtgrySn=2503180018&sc_pstSn=2604070004&sc_userId=&sc_ntcPstYn=&sc_delYn=&sc_ctgry=&useYn=&sc_faqCtgryCd=099&sc_qnaCtgryCd=&sc_plcyQnaSn=0&pstSn=&recordCountPerPage=10&sc_wDateS=&sc_wDateE=&sc=&sw="}], "G": [{"t": "구직단념청년", "full": "구직단념청년", "d": "일하고 싶은 마음은 있지만, 최근 6개월 넘게 취업·교육·훈련 없이 쉬고 있는 청년이에요."}, {"t": "참여수당", "full": "참여수당", "d": "프로그램에 참여하거나 끝까지 마치면 받는 돈이에요. 월급이 아니라 참여에 대한 보상이에요."}, {"t": "구직급여(실업급여)", "full": "구직급여(실업급여)", "d": "고용보험에 가입해 일하다가 원치 않게 일을 그만뒀을 때, 다시 일자리를 찾는 동안 받는 돈이에요."}, {"t": "구직촉진수당", "full": "구직촉진수당", "d": "국민취업지원제도 I유형 참여자가 구직활동을 하면 최대 6개월간 받는 생활비예요."}, {"t": "취업알선", "full": "취업알선", "d": "상담사가 나에게 맞는 회사를 찾아 연결해 주는 거예요."}, {"t": "근속", "full": "근속", "d": "한 회사에 계속 다니는 거예요. '3개월 근속'은 취업 후 3개월 이상 그만두지 않고 다녔다는 뜻이에요."}, {"t": "일경험", "full": "일경험", "d": "정식 취업 전에 기업에서 실제 업무를 해보는 거예요. 근로계약이 아닌 '연수' 형태인 경우가 많아요."}, {"t": "표준현장실습학기제", "full": "표준현장실습학기제", "d": "대학생이 한 학기 동안 기업에서 실습하고, 그걸 학점으로 인정받는 제도예요."}, {"t": "4대보험", "full": "4대보험", "d": "국민연금·건강보험·고용보험·산재보험을 합쳐 부르는 말이에요. 정식으로 고용되면 보통 함께 가입돼요."}, {"t": "주휴수당", "full": "주휴수당", "d": "일주일에 15시간 이상, 정해진 날을 빠짐없이 일하면 하루치 임금을 더 받는 거예요."}, {"t": "세전", "full": "세전", "d": "세금과 보험료를 떼기 전 금액이에요. 실제 통장에 들어오는 돈(세후)은 이보다 적어요."}, {"t": "생활임금", "full": "생활임금", "d": "최저임금보다 높게, 실제로 생활할 수 있는 수준으로 지자체가 정한 시급이에요."}, {"t": "근로계약", "full": "근로계약", "d": "회사와 임금·근무시간·기간 같은 일하는 조건을 약속하는 계약이에요. 이걸 맺어야 근로자로 보호받아요."}, {"t": "훈련장려금", "full": "훈련장려금", "d": "국민내일배움카드로 긴 훈련과정을 들으면서 출석을 잘하면 따로 받는 돈이에요."}, {"t": "해커톤", "full": "해커톤", "d": "개발자·디자이너·기획자가 팀을 짜서 1~2일 정도 짧은 시간 안에 아이디어를 실제 결과물로 만들어 겨루는 행사예요. 해킹(hack)과 마라톤(marathon)을 합친 말이에요."}, {"t": "IR", "full": "IR", "d": "투자자 앞에서 \"우리 회사는 이런 일을 하고, 앞으로 이만큼 성장할 거예요\"라고 소개하는 활동이에요. 쉽게 말해 투자를 받기 위한 회사 소개 발표예요."}, {"t": "시장 검증", "full": "시장 검증", "d": "내가 만든 제품이나 서비스를 진짜로 필요로 하는 사람이 있는지 확인하는 과정이에요. 실제로 돈 내고 쓸 사람이 있는지 직접 알아보는 거예요."}, {"t": "단순 상주", "full": "단순 상주", "d": "창업센터 같은 곳에 사무실 자리만 빌려서 들어가 있는 거예요. 교육이나 멘토링 같은 추가 도움 없이 공간만 쓰는 형태예요."}, {"t": "투자유치", "full": "투자유치", "d": "투자자에게 사업 자금을 받아 오는 거예요. 대신 보통 회사 지분(소유권) 일부를 투자자에게 나눠 줘요."}, {"t": "BM 검증", "full": "BM 검증", "d": "BM은 비즈니스 모델, 즉 \"이 사업으로 어떻게 돈을 벌 건지\"에 대한 계획이에요. 그 돈 버는 방식이 실제로 통하는지 확인해 보는 게 BM 검증이에요."}, {"t": "보육 연계형", "full": "보육 연계형", "d": "사무실 공간뿐 아니라 교육, 멘토링, 투자자 연결 같은 성장 프로그램까지 함께 지원받는 형태예요.\n아기를 돌보듯 회사가 자랄 수 있게 챙겨 준다고 해서 '보육'이라고 불러요."}, {"t": "딥테크", "full": "딥테크", "d": "AI, 반도체, 바이오, 로봇처럼 어려운 과학·공학 기술을 바탕으로 한 분야예요. 개발에 시간과 돈이 많이 들지만, 그만큼 다른 회사가 쉽게 따라 하기 어려워요."}, {"t": "시제품", "full": "시제품", "d": "정식으로 팔기 전에 \"이렇게 만들면 되겠다\"를 확인하려고 먼저 만들어 보는 샘플 제품이에요. '프로토타입'이라고도 해요."}, {"t": "기술보증기금의 보증 조건", "full": "기술보증기금의 보증 조건", "d": "기술보증기금은 기술력이 좋은 회사가 은행에서 돈을 빌릴 수 있도록 \"이 회사가 못 갚으면 우리가 대신 갚을게요\"라고 보증해 주는 공공기관이에요.\n보증 조건은 이 보증을 받으려면 갖춰야 하는 기준과 세부 내용(기술 평가 점수, 보증 비율, 보증 수수료 등)을 말해요."}, {"t": "데스밸리", "full": "데스밸리", "d": "창업하고 몇 년 동안, 개발비는 계속 나가는데 아직 돈은 잘 안 벌려서 많은 회사가 버티지 못하고 문을 닫는 시기예요. 그래서 '죽음의 계곡'이라고 불러요."}, {"t": "비지분 사업화", "full": "비지분 사업화", "d": "회사 지분을 주지 않고 받는 사업 자금이에요. 정부 지원금이 대표적이에요. 투자와 달리 회사 소유권을 나눠 줄 필요가 없어요."}, {"t": "PoC 협업", "full": "PoC 협업", "d": "PoC는 '개념 증명'이라는 뜻이에요. 스타트업이 대기업이나 기관과 손잡고 \"우리 기술이 실제로 잘 작동해요\"를 작게 시험해서 보여 주는 협업이에요."}, {"t": "우대 가점 조건", "full": "우대 가점 조건", "d": "지원사업 심사에서 특정 조건에 해당하면 점수를 더 얹어 주는 기준이에요. 예를 들어 청년 창업자이거나 지역 기업이면 몇 점을 더 주는 식이에요."}, {"t": "하한액", "full": "하한액", "d": "정해진 금액 중 가장 낮은 금액이에요. \"대출 하한액 100만 원\"이면 최소 100만 원부터 빌릴 수 있다는 뜻이에요."}, {"t": "원금균등분할상환", "full": "원금균등분할상환", "d": "빌린 원금을 매달 똑같이 나눠 갚고, 이자는 남은 돈에 맞춰 내는 방식이에요. 처음엔 내는 돈이 많고 갈수록 줄어들어요. 전체 이자는 덜 내요."}, {"t": "원리금균등분할상환", "full": "원리금균등분할상환", "d": "원금과 이자를 합친 금액을 매달 똑같이 갚는 방식이에요. 매달 나가는 돈이 같아서 계획 세우기 편해요. 대신 전체 이자는 원금균등보다 조금 더 내요."}, {"t": "8구간 이하 또는 9구간 중", "full": "8구간 이하 또는 9구간 중 긴급생계곤란자", "d": "한국장학재단 등에서는 집안 형편을 0~10구간으로 나눠요. 숫자가 작을수록 형편이 어려운 편이에요.\n8구간 이하라면 누구나 해당되고, 9구간이라도 갑자기 실직하거나 아파서 생활이 어려워진 사람은 예외로 인정해 준다는 뜻이에요."}, {"t": "6구간 이하", "full": "6구간 이하", "d": "집안 형편을 나눈 0~10구간 중 6구간 이하인 사람만 해당된다는 뜻이에요. 8구간 기준보다 대상이 더 좁아요."}, {"t": "차상위계층", "full": "차상위계층", "d": "기초생활수급자는 아니지만 형편이 그 바로 위 수준인 저소득층이에요. 여러 감면이나 지원 혜택을 받을 수 있어요."}, {"t": "중위소득 130%", "full": "중위소득 130%", "d": "우리나라 모든 가구를 소득 순서대로 한 줄로 세웠을 때 딱 가운데 있는 가구의 소득을 '중위소득'이라고 해요.\n그 금액의 1.3배까지 버는 가구라면 지원 대상이 된다는 뜻이에요. 가족 수에 따라 기준 금액이 달라요."}, {"t": "채무자의 소득과 제공자의", "full": "채무자의 소득과 제공자의 소득제공액의 합계액", "d": "돈을 빌린 본인이 버는 돈에, 부모님이나 배우자처럼 생활비를 보태 주는 사람이 주는 돈을 더한 금액이에요.\n본인 월급만 보는 게 아니라 실제로 쓸 수 있는 돈 전체를 기준으로 판단하겠다는 뜻이에요."}, {"t": "비과세", "full": "비과세", "d": "이자에 붙는 세금(보통 15.4%)을 떼지 않는 거예요. 그만큼 내 손에 남는 돈이 늘어나요."}, {"t": "정부 기여금", "full": "정부 기여금", "d": "내가 저축한 돈에 정부가 추가로 얹어주는 돈이에요."}, {"t": "무주택 세대주", "full": "무주택 세대주", "d": "집이 없으면서, 주민등록상 우리 집(세대)의 대표로 올라가 있는 사람이에요."}, {"t": "순자산", "full": "순자산", "d": "예금·집·차 같은 내 재산에서 빚을 뺀 금액이에요."}, {"t": "전세보증금반환보증", "full": "전세보증금반환보증", "d": "전세 계약이 끝났는데 집주인이 보증금을 못 돌려줄 때, 보증기관이 대신 돌려주는 보험 같은 상품이에요."}, {"t": "금융채무불이행자", "full": "금융채무불이행자", "d": "대출을 오랫동안(보통 3개월 넘게) 갚지 못해 금융기관에 등록된 사람이에요. 예전에 '신용불량자'라고 부르던 말이에요."}, {"t": "고립 청년", "full": "고립 청년", "d": "밖에 나가는 일이 거의 없고, 힘들 때 도움을 요청할 사람이 없는 청년이에요."}, {"t": "은둔 청년", "full": "은둔 청년", "d": "방이나 집 밖으로 거의 나오지 않아서 다른 사람과의 관계가 끊긴 청년이에요."}, {"t": "사례관리", "full": "사례관리", "d": "담당자가 내 상황을 살펴 필요한 지원을 계획하고, 꾸준히 연결하고 챙겨주는 거예요."}, {"t": "자기돌봄비", "full": "자기돌봄비", "d": "고립·은둔 청년이 운동, 자기계발, 마음 회복 등에 쓸 수 있게 한 번 지급하는 돈이에요."}, {"t": "바우처", "full": "바우처", "d": "정해진 서비스에만 쓸 수 있도록 정부가 주는 이용권이에요. 현금 대신 쿠폰처럼 사용해요."}, {"t": "의제", "full": "의제", "d": "함께 논의하고 해결하려고 정한 주제나 문제예요."}, {"t": "한도액", "full": "한도액", "d": "지원하거나 쓸 수 있는 금액의 최대치예요. 이 금액을 넘으면 지원받을 수 없어요."}, {"t": "가족돌봄청년", "full": "가족돌봄청년", "d": "아프거나 장애가 있는 가족을 직접 돌보면서 생계까지 책임지는 청년이에요."}, {"t": "자립준비청년", "full": "자립준비청년", "d": "보육원 같은 시설이나 위탁가정에서 보호받다가 성인이 되어 홀로서기를 준비하는 청년이에요."}, {"t": "거점형 청년공간", "full": "거점형 청년공간", "d": "시·군이나 공공기관이 운영하는 큰 청년공간이에요. 취업·창업 지원과 휴식을 한곳에서 할 수 있어요."}, {"t": "생활밀착형 청년공간", "full": "생활밀착형 청년공간", "d": "동네 카페, 공방, 책방 같은 민간 공간을 청년 활동 공간으로 쓰는 곳이에요."}, {"t": "주민참여예산", "full": "주민참여예산", "d": "주민이 직접 정책 사업을 제안하고, 그 사업이 시 예산에 반영되도록 하는 제도예요."}, {"t": "대시민투표", "full": "대시민투표", "d": "제안된 사업 중 어떤 걸 예산에 넣을지 시민들이 투표로 고르는 거예요."}, {"t": "지역소멸", "full": "지역소멸", "d": "인구가 계속 줄어서 마을이나 지역이 사라질 위기에 놓이는 현상이에요."}], "L": [{"n": "온통청년", "d": "정부랑 지자체 청년정책을 한 번에 검색할 수 있는 청년정책 종합 포털이에요.\n내 조건에 맞는 정책을 찾아보고, 전화·온라인 상담(1670-1839)도 받을 수 있어요.", "u": "https://www.youthcenter.go.kr"}, {"n": "고용24", "d": "채용공고부터 국민내일배움카드, 국민취업지원제도, 실업급여까지 일자리 관련 건 여기서 거의 다 해결돼요.\n청년도전지원사업·청년성장프로젝트 신청도 여기서 해요.", "u": "https://www.work24.go.kr"}, {"n": "복지로", "d": "내가 받을 수 있는 복지 혜택을 찾아보고 온라인으로 바로 신청할 수 있는 곳이에요.\n모의계산으로 대상자인지 미리 확인해볼 수 있어요.", "u": "https://www.bokjiro.go.kr"}, {"n": "정부24 (보조금24)", "d": "‘보조금24’에서 나한테 해당되는 정부·지자체 지원금을 한 번에 조회할 수 있어요.\n등본 같은 민원서류 발급도 여기서 하면 돼요.", "u": "https://www.gov.kr"}, {"n": "마이홈포털", "d": "청년 전·월세 지원, 행복주택 같은 공공임대 정보를 모아둔 주거 포털이에요.\n자가진단으로 내가 신청할 수 있는 주거지원을 확인해볼 수 있어요.", "u": "https://www.myhome.go.kr"}, {"n": "K-Startup (창업지원포털)", "d": "창업을 꿈꾼다면 정부 창업지원사업 공고를 여기서 한눈에 볼 수 있어요.\n창업 교육·멘토링·원스톱 상담 정보도 있어요.", "u": "https://www.k-startup.go.kr"}, {"n": "서민금융진흥원", "d": "청년 대상 정책 저축상품이나 서민금융 대출, 금융·채무 상담을 알아볼 수 있는 곳이에요.\n목돈 모으기나 빚 문제로 고민될 때 들러보세요.", "u": "https://www.kinfa.or.kr"}, {"n": "한국장학재단", "d": "국가장학금, 학자금 대출 신청하는 곳이에요. 대학생이거나 학자금 상환 중이라면 꼭 알아둬야 해요.", "u": "https://www.kosaf.go.kr"}, {"n": "청년인재DB", "d": "정부 위원회에 청년위원으로 참여하고 싶을 때 내 정보를 등록해두는 곳이에요.\n청년정책에 직접 목소리를 내고 싶다면 추천해요.", "u": "https://www.2030db.go.kr"}, {"n": "청년몽땅정보통", "d": "서울시 청년수당, 청년월세 등 서울 청년정책을 한곳에 모아둔 서울시 대표 청년포털이에요.\n서울청년센터 프로그램 신청이랑 청년 상담도 여기서 해요.", "u": "https://youth.seoul.go.kr"}, {"n": "서울일자리포털", "d": "서울 기업 채용정보랑 서울시 일자리사업 신청 정보를 볼 수 있어요.\n서울에서 일자리를 찾는다면 고용24와 같이 보면 좋아요.", "u": "https://job.seoul.go.kr"}, {"n": "경기청년포털", "d": "경기도와 31개 시·군 청년정책을 한 번에 볼 수 있는 경기도 대표 청년포털이에요.\n동네 청년공간 찾기, 마음상담 같은 서비스도 있어요.", "u": "https://youth.gg.go.kr"}, {"n": "잡아바 (경기도일자리포털)", "d": "경기도 채용정보와 취업지원 정책을 모아둔 포털이에요.\n자소서 첨삭, AI 역량검사, 온라인 취업교육을 무료로 쓸 수 있어요.", "u": "https://job.gg.go.kr"}, {"n": "중앙청년지원센터", "d": "전국 청년센터를 연결하고 지원하는 청년정책 허브 기관이에요.\n나의 지역을 선택하면 우리 동네에 있는 청년센터를 확인할 수 있어요.", "u": "https://nysc.or.kr/nysc/pages/center1.php"}, {"n": "경기도노동권익센터", "d": "경기도에서 살거나 일하는 사람이면 누구나 이용할 수 있는 무료 노동상담 창구예요.\n임금체불·부당해고·산재 상담부터 마을노무사 연계 권리구제까지 지원해요.", "u": "https://labor.gg.go.kr/"}, {"n": "서울노동권익센터", "d": "서울시민의 노동 문제를 상담하고 권리구제를 돕는 기관이에요.\n공인노무사 무료 상담을 방문·전화·온라인으로 받을 수 있고, 퇴근길 지하철역 상담도 운영해요.", "u": "https://www.labors.or.kr/"}]};
+const ARTIFACT_URL = "https://claude.ai/artifact/5UfED4vn9DSpgJRDsqHJz2";
+/* 별도 사이트(넷리파이·깃허브 페이지 등)에 올리면 그 사이트 주소로, 클로드 안에서 열면 아티팩트 주소로 QR을 만들어요 */
+const SHARE_URL = (()=>{try{const h=location.hostname;if(/^https?:$/.test(location.protocol)&&h&&!/claude|anthropic|localhost|^127\./.test(h))return location.origin+location.pathname}catch(e){}return ARTIFACT_URL})();
+const CATS = {job:{label:"취업"},biz:{label:"창업"},money:{label:"돈·집"},rel:{label:"관계·마음"}};
+const REGIONS = {seoul:"서울",gg:"경기",etc:"그 외 지역"};
+const FOOT = `<svg viewBox="0 0 20 34" aria-hidden="true"><ellipse cx="10" cy="11" rx="7.2" ry="10"/><ellipse cx="10.6" cy="27.5" rx="5" ry="5.8"/></svg>`;
+const fp = cls => FOOT.replace('<svg','<svg class="fp '+cls+'"');
+
+/* ───── 질문 (걸음) ───── */
+const Q = {
+  region:[["seoul","서울특별시"],["gg","경기도"],["etc","그 외 지역"]],
+  school:[["univ","재학 중"],["leave","휴학 중"],["defer","졸업유예·수료"],["grad","졸업했어요"]],
+  grade:[["1","1학년"],["2","2학년"],["3","3학년"],["4","4학년+"]],
+  path:[["job","회사에 취업하고 싶어요","공채·인턴·직무 준비"],["biz","내 일을 시작하고 싶어요","창업·사이드 프로젝트"],["study","대학원·진학을 생각해요",""],["unsure","아직 잘 모르겠어요","무엇을 하고 싶은지 찾는 중"],["rest","잠시 멈춰 쉬고 싶어요","지쳐서 숨 고를 시간이 필요해요"]],
+  stage:{
+    job:{t:"취업 준비는 어디쯤 와 있나요?",h:"단계에 따라 필요한 지원이 달라요.",o:[["explore","어떤 직무가 맞는지 찾는 중이에요",""],["build","직무는 정했고 경험·스펙을 쌓는 중이에요","인턴, 자격증, 직무교육"],["apply","지원서를 내고 면접을 보는 중이에요",""]]},
+    biz:{t:"창업은 어디쯤 와 있나요?",h:"예비창업자인지, 창업 몇 년 차인지에 따라 신청할 수 있는 사업이 갈려요.",o:[["idea","아이디어를 다듬는 중이에요",""],["team","팀을 꾸리고 시제품을 준비해요",""],["own","사업자등록을 했어요",""]]},
+    unsure:{t:"무엇이 가장 막막한가요?",h:"막막한 지점을 알면 맞는 프로그램을 찾기 쉬워요.",o:[["self","나에게 맞는 게 뭔지 모르겠어요",""],["noexp","해본 경험이 없어서 고르기 어려워요",""],["noinfo","정보를 어디서 찾아야 할지 모르겠어요",""]]},
+    rest:{t:"지금 어떤 쉼이 필요한가요?",h:"",o:[["tired","학교는 다니지만 많이 지쳐 있어요",""],["long","6개월 넘게 일·학업·훈련 없이 쉬고 있어요",""]]}
+  },
+  fy:[["lt3","3년 이내"],["3to7","3~7년"],["gt7","7년 초과"]],
+  work:[["none","하고 있지 않아요",""],["part","아르바이트·프리랜서",""],["intern","인턴·계약직",""],["full","정규직으로 일해요",""]],
+  house:[["parents","가족과 함께 살아요",""],["monthly","월세로 자취해요",""],["jeonse","전세로 살아요",""],["dorm","기숙사·쉐어하우스",""],["own","내 집(자가)이 있어요",""]],
+  money:[["tuition","등록금·학비가 부담돼요"],["living","매달 생활비가 빠듯해요"],["save","졸업 전후로 목돈을 모으고 싶어요"],["loan","학자금·대출을 갚아야 해요"],["overdue","갚을 돈이 3개월 넘게 밀렸어요"],["mnone","지금은 괜찮아요"]],
+  cond:[["0","괜찮은 편이에요",""],["1","조금 지치고 불안해요",""],["2","많이 지치고, 사람 만나는 게 힘들어요",""]],
+  wants:[["people","새로운 사람 만나기"],["culture","공연·전시·책"],["club","동아리·팀 프로젝트"],["space","편하게 머물 공간"],["local","다른 지역에서 살아보기"],["voice","청년정책에 의견 내기"]],
+  priority:[["job","취업과 진로","c-job"],["biz","창업","c-biz"],["money","돈 걱정","c-money"],["house","집 문제","c-money"],["rel","마음과 관계","c-rel"]]
+};
+const A0 = ()=>({age:22,region:null,school:null,grade:null,path:null,stage:null,fy:null,work:null,house:null,indep:false,money:new Set(),cond:null,wants:new Set(),priority:null});
+let A = A0();
+const S = {view:"intro", i:0, mode:"kiosk", open:new Set(), showOthers:false, filter:"all"};
+
+function stepList(){
+  const s=["age","region","school","path"];
+  if(A.path&&Q.stage[A.path]) s.push("stage");
+  s.push("work","house","money","mind","priority");
+  return s;
+}
+
+/* ───── 답 → 판정용 프로필 ───── */
+function profile(){
+  const st=new Set(); const keys=new Set(); const interests=new Set();
+  if(A.school) st.add(A.school);
+  const inSchool=["univ","leave","defer"].includes(A.school);
+  if(["part","intern","full"].includes(A.work)) st.add("work");
+  if(A.path==="job"&&A.work!=="full") st.add("seek");
+  if(A.path==="biz") st.add(A.stage==="own"?"founder":"pre");
+  if(A.path==="rest"&&A.stage==="long") st.add("rest");
+  const K={explore:["lost","skill"],build:["exp","skill"],apply:["interview","jobmoney"],idea:["idea","sedu"],team:["idea","sfund","sedu"],own:["sfund","sedu"],
+           self:["lost"],noexp:["lost","exp"],noinfo:["lost"],tired:["mind","restk"],long:["restk","isolated"]};
+  (K[A.stage]||[]).forEach(k=>keys.add(k));
+  if(A.path==="unsure") keys.add("lost");
+  if(A.path==="rest") keys.add("restk");
+  if(A.path==="job") interests.add("job");
+  if(A.path==="biz") interests.add("biz");
+  const M={tuition:["tuition"],living:["jobmoney"],save:["save"],loan:["debt"],overdue:["debt","overdue"]};
+  A.money.forEach(m=>(M[m]||[]).forEach(k=>keys.add(k)));
+  if(["monthly","jeonse"].includes(A.house)||A.indep) keys.add("rent");
+  if(A.cond==="1") keys.add("mind");
+  if(A.cond==="2"){keys.add("mind");keys.add("isolated")}
+  A.wants.forEach(w=>keys.add(w));
+  if([...keys].some(k=>["save","rent","tuition","debt"].includes(k))) interests.add("money");
+  if(A.cond!=="0"&&A.cond!==null||A.wants.size) interests.add("rel");
+  const has=k=>st.has(k);
+  const founder=has("founder");
+  const p={age:A.age,region:A.region,has,fy:A.fy,house:A.house,interests,keys,grade:A.grade,inSchool,status:st};
+  p.notEmp=!founder&&(A.work==="none"||(inSchool&&A.work!=="full"));
+  p.startup=A.path==="biz"; p.pre=A.path==="biz"&&!founder;
+  p.f3=founder&&A.fy==="lt3"; p.f7=founder&&A.fy!=="gt7";
+  p.prio=A.priority==="house"?"money":A.priority;
+  return p;
+}
+
+const RULES = {
+  job1:{age:[18,34],keys:["restk","lost","jobmoney"],fn:p=>p.has("univ")?[0]:(p.has("rest")?[2]:(p.has("seek")?[1,"최근 6개월 이상 취업·교육·훈련 이력이 없어야 해요 (구직단념청년)"]:[0]))},
+  job2:{age:[15,34],keys:["restk","space","mind","interview","people"]},
+  job3:{age:[15,69],keys:["jobmoney","interview","skill"],fn:p=>(p.has("seek")||p.has("rest"))?[2,"I유형(구직촉진수당)은 소득·재산 기준이 있어요. 15~34세는 II유형을 소득과 상관없이 신청할 수 있어요"]:[0]},
+  job4:{age:[15,99],keys:["lost","skill"]},
+  job5:{age:[19,39],keys:["exp"],fn:p=>p.has("univ")?[1,"참여대학(37개교)에 우리 학교가 있는지 확인해요. 휴학생·졸업생은 안 돼요"]:[0]},
+  job6:{age:[19,39],region:"gg",keys:["lost","exp"]},
+  job7:{age:[18,39],region:"gg",keys:["interview","lost"],fn:p=>p.notEmp?[2]:[0]},
+  job8:{age:[15,39],keys:["skill","exp"],fn:p=>{if(!p.notEmp||p.has("univ"))return[0];return p.has("leave")?[1,"재학생은 참여가 제한돼요. 휴학생 가능 여부를 확인해요"]:[2]}},
+  job9:{age:[15,39],keys:["exp"],fn:p=>{if(!p.notEmp)return[0];return[2]}},
+  job10:{age:[18,99],region:"seoul",keys:["exp","jobmoney","skill"],fn:p=>p.notEmp?[2,"사업별로 요구 조건이 따로 있어요"]:[0]},
+  job11:{age:[18,34],region:"seoul",keys:["exp","skill"],fn:p=>{if(!p.notEmp)return[0];return[2]}},
+  job12:{age:[15,39],region:"seoul",keys:["interview"],fn:p=>p.age>=19?[2]:[0]},
+  job13:{age:[15,99],keys:["skill"],fn:p=>{if(!(p.has("univ")||p.has("leave")))return[2];if(p.grade==="1")return[0];if(p.grade==="2")return[1,"졸업까지 2년 이상 남은 재학생은 제외돼요. 2학년 2학기부터 확인해요"];return[2]}},
+
+  biz1:{keys:["idea","sfund","sedu"],fn:p=>p.pre?[2]:(p.f3?[2,"창업 기업은 일반·기술 트랙만 가능 (로컬 트랙은 예비창업자만)"]:[0])},
+  biz2:{region:"gg",keys:["idea","club","sedu"],fn:p=>p.startup&&!p.has("founder")?[1,"경기도에 활동지를 둔 2~3인 팀이어야 하고, 만 24세 이하 팀원이 1명 이상 있어야 해요"]:[0]},
+  biz3:{age:[19,39],region:"seoul",keys:["local","idea","sfund"],fn:p=>(p.pre||p.f3)?[1,"협력 지자체의 지역자원을 연계한 창업모델이어야 해요"]:[0]},
+  biz4:{region:"gg",keys:["sedu"],fn:p=>p.startup?[2]:[0]},
+  biz5:{keys:["sfund","sedu","idea"],fn:p=>p.pre?[2,"공고일 기준 본인 명의 사업자등록이 없어야 해요"]:[0]},
+  biz6:{age:[0,39],keys:["sfund","sedu","space"],fn:p=>p.f3?[2]:(p.has("founder")&&p.fy==="3to7"?[1,"창업 경험이 있는 대표자만 7년 이내까지 가능해요"]:[0])},
+  biz7:{age:[19,39],region:"seoul",keys:["sfund","idea"],fn:p=>(p.pre||p.f3)?[1,"올해 안에 오프라인 매장을 열어야 해요"]:[0]},
+  biz8:{keys:["sfund","sedu"],fn:p=>(p.pre||p.f7)?[2,(p.has("univ")||p.has("leave"))?"대학 구성원은 우대돼요":"일반 청년도 주관대학을 골라 신청할 수 있어요"]:[0]},
+  biz9:{keys:["sfund"],fn:p=>p.f3?[2]:[0]},
+  biz10:{keys:["sfund"],fn:p=>p.has("founder")&&p.fy==="3to7"?[2]:[0]},
+
+  money1:{age:[19,34],keys:["save"],fn:p=>[2,"개인·가구 소득 기준을 충족해야 해요"]},
+  money2:{age:[15,39],keys:["save"],fn:p=>p.has("work")||p.has("founder")?[1,"월 근로·사업소득 10만 원 이상, 가구 중위소득 50% 이하여야 해요"]:[0]},
+  money3:{age:[18,34],region:"seoul",keys:["save"],fn:p=>p.has("work")?[1,"본인·가족 소득·재산 기준이 있어요. 비슷한 통장 중복 가입 여부도 확인해요"]:[0]},
+  money4:{keys:["save"],fn:p=>[0]},
+  money5:{age:[0,17],keys:["save"],fn:p=>[2,"2027년 이후 18세가 되는 청년부터 적용돼요"]},
+  money6:{age:[19,34],keys:["rent"],fn:p=>p.house==="own"?[0]:[2,"무주택 세대주·예비세대주, 소득·재산 기준이 있어요"]},
+  money7:{keys:["rent"],fn:p=>p.house==="jeonse"?[2,"보증금 3억 원 이하, 반환보증에 가입했어야 해요"]:[0]},
+  money8:{age:[19,39],region:"seoul",keys:["rent"],fn:p=>p.house==="monthly"?[2,"소득·재산·임차 조건이 있고, 생애 1회만 받을 수 있어요"]:[0]},
+  money9:{keys:["tuition"],fn:p=>p.has("univ")?[2,"국적·소득·성적 기준이 있고 학기마다 신청해요"]:(p.has("leave")?[1,"복학하는 학기에 신청할 수 있어요"]:[0])},
+  money10:{keys:["tuition","debt"],fn:p=>p.has("univ")?[2]:(p.has("leave")?[1,"대출 종류별 자격을 확인해요"]:[0])},
+  money11:{age:[19,34],keys:["debt","jobmoney"],fn:p=>true?[1,"연소득 3,500만 원 이하여야 하고, 용도별 한도가 있어요"]:[0]},
+  money12:{keys:["debt","overdue"],req:["overdue"],fn:p=>(p.has("univ")||p.has("leave")||p.age<=34)?[1,"90일 이상 연체한 경우에 해당돼요"]:[0]},
+
+  rel1:{age:[19,20],keys:["culture"]},
+  rel2:{age:[20,45],keys:["local","people"],fn:p=>[2,"프로그램마다 모집 나이와 일정이 달라요"]},
+  rel3:{age:[18,39],region:"seoul",keys:["lost","people"],fn:p=>[2,"코스별 나이 조건이 달라요 (스타터 18~24세, 스케치 19~29세 비진학 청년)"]},
+  rel4:{age:[19,34],keys:["mind","restk","people"],req:["isolated"]},
+  rel5:{age:[18,39],region:"gg",keys:["space","people"]},
+  rel6:{age:[29,39],region:"seoul",keys:["mind"]},
+  rel7:{age:[19,39],keys:["voice"],fn:p=>(p.region==="seoul"||p.inSchool)?[2,"서울청년정책네트워크 위원으로 활동해야 해요"]:[0]},
+  rel8:{keys:["club","people"],fn:p=>p.has("univ")?[1,"학부생 10명 이상인 자치 동아리여야 해요"]:[0]}
+};
+const PLAT_RULES = [
+  ["온통청년",()=>true],["고용24",p=>p.interests.has("job")],["K-Startup",p=>p.interests.has("biz")||p.startup],
+  ["마이홈포털",p=>p.keys.has("rent")],["한국장학재단",p=>p.keys.has("tuition")],["서민금융진흥원",p=>p.keys.has("save")||p.keys.has("debt")],
+  ["복지로",()=>true],["청년몽땅정보통",p=>p.region==="seoul"],["서울일자리포털",p=>p.region==="seoul"&&p.interests.has("job")],
+  ["서울노동권익센터",p=>p.region==="seoul"&&p.has("work")],["경기청년포털",p=>p.region==="gg"],["잡아바",p=>p.region==="gg"&&p.interests.has("job")],
+  ["경기도노동권익센터",p=>p.region==="gg"&&p.has("work")],["중앙청년지원센터",p=>p.region==="etc"],["청년인재DB",p=>p.keys.has("voice")]
+];
+
+
+function evaluate(pol,p){
+  const r=RULES[pol.id]||{};
+  if(r.age&&(p.age<r.age[0]||p.age>r.age[1])) return null;
+  if(r.region&&p.region!==r.region) return null;
+  let st=2,note=null;
+  if(r.fn){const o=r.fn(p);st=o[0];note=o[1]||null}
+  if(!st) return null;
+  if(r.req&&!r.req.some(k=>p.keys.has(k))) return null;
+  const matched=(r.keys||[]).filter(k=>p.keys.has(k));
+  const why=[];
+  if(r.region) why.push(`<b>${REGIONS[r.region]}</b> 주소지`);
+  if(r.age&&r.age[1]<60) why.push(`만 <b>${p.age}세</b> 대상`);
+  matched.slice(0,3).forEach(k=>KEYTXT[k]&&why.push(KEYTXT[k]));
+  let score=matched.length*3+(p.interests.has(pol.cat)?2:0)+(r.region?1:0)+(st===2?1.5:0)+(r.fn?0.5:0);
+  if(p.prio===pol.cat) score+=matched.length?4:1;
+  if(A.priority==="house"&&matched.includes("rent")) score+=4;
+  return {pol,st,note,why,score,matched};
+}
+const KEYTXT={lost:"진로 탐색",skill:"직무 역량",exp:"일 경험",interview:"면접·지원",jobmoney:"생활비",idea:"아이디어 단계",sfund:"창업 자금",sedu:"창업 교육",save:"목돈 마련",rent:"주거비",tuition:"학비",debt:"대출 부담",overdue:"연체 해결",mind:"마음 돌봄",restk:"쉼과 회복",isolated:"일상 회복",people:"새로운 사람",culture:"문화생활",club:"팀 활동",space:"머물 공간",local:"지역 살아보기",voice:"정책 참여"};
+
+function results(){
+  const p=profile();
+  const all=DATA.P.map(x=>evaluate(x,p)).filter(Boolean).filter(x=>x.matched.length||p.interests.has(x.pol.cat)||x.pol.cat===p.prio)
+    .sort((a,b)=>b.score-a.score||b.st-a.st);
+  const extra=DATA.P.map(x=>evaluate(x,p)).filter(Boolean).filter(x=>!all.includes(x)&&!all.some(y=>y.pol.id===x.pol.id));
+  const top=[],cap={};
+  for(const pass of [1,2]) for(const x of all){
+    if(top.length>=5) break; if(top.includes(x)) continue;
+    const lim=x.pol.cat===p.prio?3:2;
+    if(pass===1&&(cap[x.pol.cat]||0)>=lim) continue;
+    top.push(x); cap[x.pol.cat]=(cap[x.pol.cat]||0)+1;
+  }
+  top.sort((a,b)=>b.score-a.score);
+  const others=[...all.filter(x=>!top.includes(x)),...extra];
+  return {p,top,others};
+}
+function persona(p){
+  const P={job:["커리어를 향해 걷는 중","진로를 좁히고 경험을 쌓도록 돕는 정책부터 챙겨요."],biz:["내 일을 여는 중","창업 단계에 맞는 자금과 교육을 먼저 살펴봐요."],
+    money:["자립의 기반을 다지는 중","돈과 집 부담을 덜어주는 정책이 첫 걸음이에요."],rel:["나를 돌보며 걷는 중","마음을 쉬게 하고 사람을 만나는 정책이 먼저예요."]};
+  return P[p.prio]||P.job;
+}
+
+/* ───── QR · 결과 주소 ───── */
+const ENC={region:{seoul:"s",gg:"g",etc:"e"},school:{univ:"u",leave:"l",defer:"d",grad:"g"},path:{job:"j",biz:"b",study:"s",unsure:"u",rest:"r"},
+  stage:{explore:"e",build:"b",apply:"a",idea:"i",team:"t",own:"o",self:"f",noexp:"x",noinfo:"n",tired:"w",long:"l"},fy:{lt3:"1","3to7":"2",gt7:"3"},
+  work:{none:"n",part:"p",intern:"i",full:"f"},house:{parents:"p",monthly:"m",jeonse:"j",dorm:"d",own:"o"},priority:{job:"j",biz:"b",money:"m",house:"h",rel:"r"}};
+const bits=(set,list)=>list.reduce((n,[k],i)=>n|(set.has(k)?1<<i:0),0).toString(36).padStart(2,"0");
+function encode(){
+  const g=(f,v)=>v==null?"0":ENC[f][v];
+  return "r-"+String(A.age).padStart(2,"0")+g("region",A.region)+g("school",A.school)+(A.grade||"0")+g("path",A.path)+g("stage",A.stage)+g("fy",A.fy)+g("work",A.work)+g("house",A.house)+(A.indep?"1":"0")+bits(A.money,Q.money)+(A.cond||"0")+bits(A.wants,Q.wants)+g("priority",A.priority);
+}
+function decode(h){
+  const m=/^r-(\d\d)([sge])([uldg])([0-4])([jbsur])([0ebaitofxnwl])([0-3])([npif])([pmjdo])([01])([0-9a-z]{2})([0-2])([0-9a-z]{2})([jbmhr])$/.exec(h);
+  if(!m) return false;
+  const rev=(f,c)=>c==="0"?null:Object.keys(ENC[f]).find(k=>ENC[f][k]===c);
+  const unb=(s,list)=>{const n=parseInt(s,36);return new Set(list.filter((_,i)=>n&(1<<i)).map(x=>x[0]))};
+  A={age:+m[1],region:rev("region",m[2]),school:rev("school",m[3]),grade:m[4]==="0"?null:m[4],path:rev("path",m[5]),stage:rev("stage",m[6]),fy:rev("fy",m[7]),work:rev("work",m[8]),house:rev("house",m[9]),indep:m[10]==="1",money:unb(m[11],Q.money),cond:m[12],wants:unb(m[13],Q.wants),priority:rev("priority",m[14])};
+  return true;
+}
+const QR_SRC=["https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js","https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js","https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"];
+let qrReady=null;
+function loadQR(){
+  if(qrReady) return qrReady;
+  qrReady=new Promise(res=>{let i=0;const next=()=>{if(window.qrcode||window.QRCode) return res(true);if(i>=QR_SRC.length) return res(false);
+    const s=document.createElement("script");s.src=QR_SRC[i++];s.onload=()=>(window.qrcode||window.QRCode)?res(true):next();s.onerror=next;document.head.appendChild(s)};next()});
+  return qrReady;
+}
+async function drawQR(url){
+  const box=document.getElementById("qrbox"); if(!box) return;
+  const ok=await loadQR(); if(!document.body.contains(box)) return;
+  try{
+    if(window.qrcode){const q=qrcode(0,"M");q.addData(url);q.make();box.innerHTML=q.createSvgTag({cellSize:4,margin:2,scalable:true});return}
+    if(window.QRCode){box.innerHTML="";new QRCode(box,{text:url,width:180,height:180,correctLevel:QRCode.CorrectLevel.M});return}
+  }catch(e){}
+  box.innerHTML=`<span style="font-size:11.5px;color:var(--sub);word-break:break-all;user-select:all">QR을 불러오지 못했어요. 이 주소로 열어 주세요.<br>${esc(url)}</span>`;
+}
+
+/* ───── 화면 ───── */
+const app=document.getElementById("app"), tunnel=document.getElementById("tunnel");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const bullets=t=>"<ul>"+t.split(/\n(?=\s*•)/).map(l=>`<li>${esc(l.replace(/^\s*•\s*/,"").replace(/\s*\n\s*/g," "))}</li>`).join("")+"</ul>";
+function brand(){return `<button class="brand" onclick="home()" aria-label="처음으로"><svg viewBox="0 0 20 34" style="fill:var(--light)"><ellipse cx="10" cy="11" rx="7.2" ry="10"/><ellipse cx="10.6" cy="27.5" rx="5" ry="5.8"/></svg>첫 걸음 정책 노선도</button>`}
+
+function buildArches(){
+  let h="";for(let i=0;i<7;i++){const w=22+i*13, ht=30+i*14;h+=`<div class="arch" style="width:${w}vmax;height:${ht}vmax;opacity:${(1-i*0.12).toFixed(2)}"></div>`}
+  tunnel.insertAdjacentHTML("beforeend",h);
+}
+function setLit(v){tunnel.style.setProperty("--lit",v);app.style.setProperty("--lit",v)}
+
+function viewIntro(){
+  setLit(.08);
+  return `<div class="top">${brand()}<button class="ghost" onclick="go('browse')">전체 정책 보기</button></div>
+  <section class="intro walk">
+    <div class="eyebrow">서울여대 · 사회생활 첫 걸음 부스</div>
+    <h1>한 걸음씩 걸어가면, <em>나에게 맞는 정책</em>이 보여요</h1>
+    <p>10개의 짧은 질문에 답하면 조사한 청년정책 ${DATA.P.length}개 가운데 지금의 나에게 꼭 맞는 카드 5장을 골라 드려요. 결과는 QR로 내 폰에 가져갈 수 있어요.</p>
+    <div class="steps-preview">${Array.from({length:7},(_,i)=>FOOT.replace('<svg',`<svg class="${i<1?"on":""}"`)).join("")}</div>
+    <button class="btn" onclick="begin()">첫 걸음 떼기</button>
+    <span style="color:var(--mist);font-size:14px">약 2분 · 입력한 정보는 저장되지 않아요</span>
+  </section>`;
+}
+
+function opt(kind,key,val,label,small,on,extra=""){
+  return `<button class="opt ${kind}" aria-pressed="${on}" onclick="pick('${key}','${val}')">${extra}<span class="box">✓</span><span><b>${label}</b>${small?`<small>${small}</small>`:""}</span></button>`;
+}
+function question(k){
+  switch(k){
+  case "age": return {t:"첫 걸음, 만 나이부터 알려주세요",h:"대부분의 청년정책은 만 나이로 대상을 정해요.",ok:true,
+    b:`<div class="age"><div class="age-row"><button onclick="setAge(A.age-1)" aria-label="한 살 줄이기">−</button><div class="age-val" id="ageVal">${A.age}<small>세</small></div><button onclick="setAge(A.age+1)" aria-label="한 살 늘리기">+</button></div>
+      <input id="ageRange" type="range" min="18" max="35" value="${A.age}" oninput="setAge(+this.value,true)" aria-label="만 나이"><div class="scale"><span>18</span><span>24</span><span>30</span><span>35</span></div></div>`};
+  case "region": return {t:"주민등록상 주소는 어디인가요?",h:"지역 정책은 주소지를 기준으로 해요. 기숙사나 자취방이 서울이어도 주소를 옮기지 않았다면 원래 주소를 골라 주세요.",ok:!!A.region,
+    b:`<div class="opts">${Q.region.map(([v,l])=>opt("radio","region",v,l,v==="etc"?"전국 단위 정책 위주로 찾아드려요":"",A.region===v)).join("")}</div>`};
+  case "school": {const g=A.school==="univ"||A.school==="leave";return {t:"지금 학교생활은 어떤 상태예요?",h:"국가장학금, 내일배움카드처럼 학적과 학년에 따라 갈리는 정책이 있어요.",ok:!!A.school&&(!g||!!A.grade),
+    b:`<div class="opts two">${Q.school.map(([v,l])=>opt("radio","school",v,l,"",A.school===v)).join("")}</div>
+      ${g?`<h3 class="sub">몇 학년인가요?</h3><div class="opts four">${Q.grade.map(([v,l])=>opt("radio","grade",v,l,"",A.grade===v)).join("")}</div>`:""}`}}
+  case "path": return {t:"졸업 후 어떤 길을 그리고 있나요?",h:"지금 가장 가까운 마음 하나를 골라 주세요.",ok:!!A.path,
+    b:`<div class="opts">${Q.path.map(([v,l,s])=>opt("radio","path",v,l,s,A.path===v)).join("")}</div>`};
+  case "stage": {const d=Q.stage[A.path];const own=A.stage==="own";return {t:d.t,h:d.h,ok:!!A.stage&&(!own||!!A.fy),
+    b:`<div class="opts">${d.o.map(([v,l,s])=>opt("radio","stage",v,l,s,A.stage===v)).join("")}</div>
+      ${own?`<h3 class="sub">창업한 지 얼마나 됐나요?</h3><div class="opts">${Q.fy.map(([v,l])=>opt("radio","fy",v,l,"",A.fy===v)).join("")}</div>`:""}`}}
+  case "work": return {t:"요즘 일을 하고 있나요?",h:"알바 소득이 있으면 받을 수 있는 저축 정책이 있고, 정규직이면 미취업 청년 정책은 빠져요.",ok:!!A.work,
+    b:`<div class="opts two">${Q.work.map(([v,l,s])=>opt("radio","work",v,l,s,A.work===v)).join("")}</div>`};
+  case "house": {const ask=A.house==="parents"||A.house==="dorm";return {t:"지금 어디에서 지내고 있나요?",h:"월세·전세 지원은 사는 형태에 따라 달라요.",ok:!!A.house,
+    b:`<div class="opts">${Q.house.map(([v,l])=>opt("radio","house",v,l,"",A.house===v)).join("")}</div>
+      ${ask?`<h3 class="sub">한 걸음 더</h3><div class="opts">${opt("","indep","1","1~2년 안에 독립(자취)을 계획하고 있어요","전세대출 같은 정책을 미리 알아둘 수 있어요",A.indep)}</div>`:""}`}}
+  case "money": return {t:"돈과 관련해 마음에 걸리는 게 있나요?",h:"해당하는 걸 모두 골라요. 부스에서 기록하지 않으니 편하게 골라도 돼요.",ok:A.money.size>0,
+    b:`<div class="opts two">${Q.money.map(([v,l])=>opt("","money",v,l,"",A.money.has(v))).join("")}</div>`};
+  case "mind": return {t:"요즘 마음의 컨디션은 어때요?",h:"마음을 돌보는 것도 사회생활의 첫 걸음이에요.",ok:A.cond!==null,
+    b:`<div class="opts">${Q.cond.map(([v,l])=>opt("radio","cond",v,l,"",A.cond===v)).join("")}</div>
+      <h3 class="sub">해보고 싶은 게 있다면 골라요 (선택)</h3><div class="opts two">${Q.wants.map(([v,l])=>opt("","wants",v,l,"",A.wants.has(v))).join("")}</div>`};
+  case "priority": return {t:"마지막 한 걸음. 가장 먼저 풀고 싶은 고민은?",h:"고른 고민의 정책을 카드 맨 앞에 놓을게요.",ok:!!A.priority,
+    b:`<div class="opts">${Q.priority.map(([v,l,c])=>`<button class="opt radio ${c}" aria-pressed="${A.priority===v}" onclick="pick('priority','${v}')"><span class="dot"></span><span><b>${l}</b></span></button>`).join("")}</div>`};
+  }
+}
+function viewQuiz(){
+  const steps=stepList(); if(S.i>=steps.length) S.i=steps.length-1;
+  const k=steps[S.i], q=question(k), n=steps.length;
+  setLit(.12+.7*(S.i/(n-1)));
+  const path=steps.map((_,j)=>fp((j%2?"r":"l")+(j<S.i?" done":j===S.i?" now":""))).join("")+`<span class="sun"></span>`;
+  const last=S.i===n-1;
+  return `<div class="top">${brand()}<button class="ghost" onclick="home()">처음으로</button></div>
+  <div class="path" aria-hidden="true">${path}</div>
+  <div class="stepcount"><b>${S.i+1}번째 걸음</b> · 빛까지 ${n-S.i-1}걸음 남았어요</div>
+  <section class="q walk" id="q" aria-live="polite"><h2>${q.t}</h2>${q.h?`<p class="hint">${q.h}</p>`:`<div style="height:24px"></div>`}${q.b}</section>
+  <div class="nav"><button class="back" onclick="back()">← 이전</button><button class="btn" ${q.ok?"":"disabled"} onclick="next()">${last?"빛 속으로 나가기":"다음 걸음"} →</button></div>`;
+}
+
+function card(x,i){
+  const {pol,st,note,why}=x, open=S.open.has(pol.id);
+  const terms=DATA.G.filter(g=>g.t.length>1&&(pol.detail+pol.sum).includes(g.t)).slice(0,4);
+  return `<article class="card c-${pol.cat} rise">
+    <div class="head"><div class="row"><span class="rank">${i!=null?String(i+1).padStart(2,"0"):""}</span><span class="cat">${CATS[pol.cat].label}</span></div>
+      <p class="lead">${esc(pol.intro)}</p><h3>${esc(pol.name)}</h3><div class="tags">${esc(pol.tags)}</div></div>
+    <div class="body">
+      ${st?`<div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap">${st===2?'<span class="badge ok">조건 충족 예상</span>':'<span class="badge check">조건 확인 필요</span>'}</div>`:""}
+      ${why&&why.length?`<div class="why">${why.map(w=>`<span>${w}</span>`).join("")}</div>`:""}
+      ${bullets(pol.sum)}
+      ${note?`<div class="warnbox"><b>확인해요</b> · ${esc(note)}</div>`:""}
+      ${open?`<div><h4>지원자격 및 지원내용</h4>${bullets(pol.detail)}</div>${terms.length?`<div><h4>용어 풀이</h4><div class="gloss">${terms.map(g=>`<div><b>${esc(g.full)}</b> — ${esc(g.d)}</div>`).join("")}</div></div>`:""}`:""}
+      <div class="actions"><button class="more" aria-expanded="${open}" onclick="toggle('${pol.id}')">${open?"접기":"지원자격 보기"}</button>${pol.link?`<a class="go" href="${esc(pol.link)}" target="_blank" rel="noopener">신청 페이지 ↗</a>`:""}</div>
+    </div></article>`;
+}
+function viewResult(){
+  const {p,top,others}=results(); const [pt,pd]=persona(p);
+  const chips=[`만 ${A.age}세`,REGIONS[A.region]+" 주소지",(Q.school.find(x=>x[0]===A.school)||[])[1]+(A.grade?` ${A.grade}학년`:""),(Q.path.find(x=>x[0]===A.path)||[])[1],(Q.house.find(x=>x[0]===A.house)||[])[1]].filter(Boolean);
+  const url=SHARE_URL+"#"+encode();
+  const plats=PLAT_RULES.filter(([n,f])=>f(p)).map(([n])=>DATA.L.find(l=>l.n.startsWith(n))).filter(Boolean);
+  setTimeout(()=>drawQR(url),0);
+  return `<div class="top">${brand()}${S.mode==="kiosk"?`<button class="ghost" onclick="home()">다음 사람 시작</button>`:`<button class="ghost" onclick="restartMine()">다시 해보기</button>`}</div>
+  <section class="arrive rise">
+    <div><div class="eyebrow">통로 끝에 도착했어요</div><h1>${pt}</h1>
+      <p>${pd} 조건이 맞는 정책 ${top.length+others.length}개 중에서 지금 가장 필요한 ${top.length}개를 골랐어요.</p>
+      <div class="me">${chips.map(c=>`<span>${esc(c)}</span>`).join("")}</div></div>
+    ${S.mode==="kiosk"?`<div class="qr"><div id="qrbox"></div><b>내 폰으로 가져가기</b><span>카메라로 찍으면 이 카드 5장이 그대로 열려요</span></div>`:""}
+  </section>
+  <div class="secthead"><h2>나를 위한 정책 카드 ${top.length}장</h2><span class="swipe">${top.length>2?"옆으로 넘겨 보세요":""}</span></div>
+  ${top.length?`<div class="deck">${top.map(card).join("")}</div>`:`<p class="foot">지금 조건에 꼭 맞는 정책을 찾지 못했어요. 아래 플랫폼에서 더 찾아볼 수 있어요.</p>`}
+  ${others.length?`<div class="secthead"><h2>조건이 맞는 다른 정책</h2><span>${others.length}개</span></div>
+    ${S.showOthers?`<div class="others">${others.map(x=>`<a class="other c-${x.pol.cat}" href="${esc(x.pol.link)}" target="_blank" rel="noopener"><i></i><span><b>${esc(x.pol.name)}</b><span>${esc(x.pol.intro)}</span></span><em>${x.st===2?"충족 예상":"확인 필요"} ↗</em></a>`).join("")}</div>`:""}
+    <div style="text-align:center;margin-top:10px"><button class="link" onclick="S.showOthers=!S.showOthers;render(false)">${S.showOthers?"접기":"목록 펼쳐 보기"}</button></div>`:""}
+  <div class="secthead"><h2>더 찾아볼 곳</h2><span>정책 플랫폼</span></div>
+  <div class="plats">${plats.map(l=>`<a class="plat" href="${esc(l.u)}" target="_blank" rel="noopener"><b>${esc(l.n)} ↗</b><span>${esc(l.d.split("\n")[0])}</span></a>`).join("")}</div>
+  ${S.mode==="kiosk"?`<div class="endbar"><button class="btn dark" onclick="home()">다음 사람 시작하기</button></div>`:""}
+  <p class="foot">조건 판정은 청소년환경 수업 조사팀이 정리한 지원자격을 바탕으로 한 참고용이에요. 소득·재산 기준과 모집 기간은 정책마다 달라서, 신청 전에 공식 페이지에서 꼭 확인해요.</p>`;
+}
+function viewBrowse(){
+  const shown=DATA.P.filter(x=>S.filter==="all"||x.cat===S.filter);
+  const cnt=c=>DATA.P.filter(x=>x.cat===c).length;
+  return `<div class="top">${brand()}<button class="ghost" onclick="home()">처음으로</button></div>
+  <div class="secthead"><h2>전체 정책 ${DATA.P.length}개</h2><span>부스 상담용</span></div>
+  <div class="filters">${["all",...Object.keys(CATS)].map(c=>`<button aria-pressed="${S.filter===c}" onclick="S.filter='${c}';render(false)" class="${c!=="all"?"c-"+c:""}">${c!=="all"?"<i></i>":""}${c==="all"?"전체":CATS[c].label} <span style="opacity:.6">${c==="all"?DATA.P.length:cnt(c)}</span></button>`).join("")}</div>
+  <div class="grid">${shown.map(pol=>card({pol,st:0,why:[]},null)).join("")}</div>
+  <div class="secthead"><h2>정책 플랫폼</h2><span>${DATA.L.length}곳</span></div>
+  <div class="plats">${DATA.L.map(l=>`<a class="plat" href="${esc(l.u)}" target="_blank" rel="noopener"><b>${esc(l.n)} ↗</b><span>${esc(l.d.split("\n")[0])}</span></a>`).join("")}</div>`;
+}
+
+function render(scroll=true){
+  const day=S.view==="result"||S.view==="browse";
+  document.body.classList.toggle("day",day);
+  app.classList.toggle("wide",day);
+  app.innerHTML=S.view==="intro"?viewIntro():S.view==="quiz"?viewQuiz():S.view==="result"?viewResult():viewBrowse();
+  if(scroll) window.scrollTo({top:0});
+}
+function keep(){const y=window.scrollY;render(false);window.scrollTo({top:y})}
+function go(v){S.view=v;S.filter="all";S.open.clear();render()}
+function home(){A=A0();S.i=0;S.showOthers=false;S.open.clear();S.mode="kiosk";try{if(location.hash)history.replaceState(null,"",location.pathname+location.search)}catch(e){}go("intro")}
+function restartMine(){A=A0();S.i=0;S.open.clear();S.view="quiz";render()}
+function begin(){A=A0();S.i=0;S.view="quiz";render()}
+function next(){const n=stepList().length;if(S.i<n-1){S.i++;render()}else{S.view="result";S.open.clear();S.showOthers=false;render()}}
+function back(){if(S.i>0){S.i--;render()}else home()}
+function setAge(v,fromRange){A.age=Math.max(18,Math.min(35,v));document.getElementById("ageVal").innerHTML=`${A.age}<small>세</small>`;if(!fromRange)document.getElementById("ageRange").value=A.age}
+function pick(key,val){
+  if(key==="money"||key==="wants"){const s=A[key];
+    if(val==="mnone"){A.money=new Set(s.has("mnone")?[]:["mnone"])}
+    else{s.has(val)?s.delete(val):s.add(val);if(key==="money")s.delete("mnone")}}
+  else if(key==="indep"){A.indep=!A.indep}
+  else{A[key]=val;
+    if(key==="school"&&!["univ","leave"].includes(val))A.grade=null;
+    if(key==="path"){A.stage=null;A.fy=null}
+    if(key==="stage"&&val!=="own")A.fy=null;
+    if(key==="house"&&!["parents","dorm"].includes(val))A.indep=false}
+  keep();
+}
+function toggle(id){S.open.has(id)?S.open.delete(id):S.open.add(id);keep()}
+
+buildArches();
+const h=(location.hash||"").slice(1);
+if(h&&decode(h)){S.mode="mine";S.view="result";render()}else render();
+</script>
+
+</body>
+</html>
